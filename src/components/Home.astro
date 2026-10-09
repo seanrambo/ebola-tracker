@@ -30,10 +30,36 @@ const cd = countries.find((c) => c.code === 'CD');
 ---
 
 <Base title={d.meta.title} description={d.meta.description} lang={lang}>
-	<section class="hero">
-		<div class="wrap">
+	<section id="globe" class="banner">
+		<div class="wrap banner-text">
 			<p class="eyebrow"><span class="badge" data-status="active">{d.hero.badge}</span></p>
 			<h1>{d.hero.title}</h1>
+			<p class="muted banner-help">{d.globe.help}</p>
+			<div class="toggles" role="group" aria-label={d.globe.layers}>
+				<button id="layer-current" aria-pressed="true">{d.globe.current}</button>
+				<button id="layer-history" aria-pressed="false">{d.globe.past}</button>
+			</div>
+		</div>
+		<div class="stage">
+			<div id="globe-canvas" aria-label={d.globe.aria}></div>
+			<p class="globe-loading muted" id="globe-loading">{d.globe.loading}</p>
+			<ul class="legend">
+				<li><span style="--c: var(--active)"></span>{d.status.active}</li>
+				<li><span style="--c: var(--imported)"></span>{d.status.imported}</li>
+				<li><span style="--c: var(--ended)"></span>{d.status.ended}</li>
+				<li><span style="--c: var(--monitoring)"></span>{d.status.monitoring}</li>
+				<li><span class="dot" style="--c: #ffd166"></span>{d.globe.legendPast}</li>
+			</ul>
+		</div>
+		<div class="wrap banner-panel">
+			<aside class="card panel" id="panel" aria-live="polite">
+				<p class="muted">{d.panel.placeholder}</p>
+			</aside>
+		</div>
+	</section>
+
+	<section class="hero">
+		<div class="wrap">
 			<p class="lede">{tr(data.epidemic.summary, lang)}</p>
 			<p class="muted small">
 				{d.hero.updated(fmtDate(data.updated, lang))} · <a href={localePath(lang, '/sources')}>{d.hero.howWeCount}</a>
@@ -87,37 +113,6 @@ const cd = countries.find((c) => c.code === 'CD');
 					<p class="small" id="alerts-msg" role="status"></p>
 					<p class="muted small">{d.alerts.privacy}</p>
 				</form>
-			</div>
-		</div>
-	</section>
-
-	<section id="globe">
-		<div class="wrap">
-			<div class="globe-head">
-				<div>
-					<h2>{d.globe.title}</h2>
-					<p class="muted">{d.globe.help}</p>
-				</div>
-				<div class="toggles" role="group" aria-label={d.globe.layers}>
-					<button id="layer-current" aria-pressed="true">{d.globe.current}</button>
-					<button id="layer-history" aria-pressed="false">{d.globe.past}</button>
-				</div>
-			</div>
-			<div class="globe-grid">
-				<div class="globe-box">
-					<div id="globe-canvas" aria-label={d.globe.aria}></div>
-					<p class="globe-loading muted" id="globe-loading">{d.globe.loading}</p>
-					<ul class="legend">
-						<li><span style="--c: var(--active)"></span>{d.status.active}</li>
-						<li><span style="--c: var(--imported)"></span>{d.status.imported}</li>
-						<li><span style="--c: var(--ended)"></span>{d.status.ended}</li>
-						<li><span style="--c: var(--monitoring)"></span>{d.status.monitoring}</li>
-						<li><span class="dot" style="--c: #ffd166"></span>{d.globe.legendPast}</li>
-					</ul>
-				</div>
-				<aside class="card panel" id="panel" aria-live="polite">
-					<p class="muted">{d.panel.placeholder}</p>
-				</aside>
 			</div>
 		</div>
 	</section>
@@ -276,12 +271,71 @@ const cd = countries.find((c) => c.code === 'CD');
 
 <style>
 	.hero {
-		padding: 48px 0 24px;
-		background: radial-gradient(ellipse at top, rgba(229, 72, 77, 0.12), transparent 60%);
+		padding: 24px 0;
 	}
-	.hero h1 {
-		font-size: clamp(1.8rem, 4vw, 2.8rem);
+	/* Full-width globe banner: the globe fills the section and the title and panel sit over it. */
+	.banner {
+		position: relative;
+		height: clamp(560px, calc(100vh - 56px), 760px);
+		padding: 0;
+		overflow: hidden;
+		border-bottom: 1px solid var(--border);
+		background: radial-gradient(circle at 50% 50%, #13213a, var(--bg) 65%);
+		scroll-margin-top: 56px;
+	}
+	.stage {
+		position: absolute;
+		inset: 0;
+	}
+	/* Darkens the left edge so the title stays readable over the globe. */
+	.stage::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(90deg, rgba(10, 15, 23, 0.85), rgba(10, 15, 23, 0.35) 35%, transparent 55%),
+			radial-gradient(ellipse at top left, rgba(229, 72, 77, 0.14), transparent 50%);
+		pointer-events: none;
+	}
+	.banner-text,
+	.banner-panel {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+	}
+	.banner-text {
+		padding-top: 40px;
+	}
+	.banner-text > * {
+		max-width: 440px;
+	}
+	.banner h1 {
+		font-size: clamp(1.8rem, 3.6vw, 2.8rem);
 		letter-spacing: -0.02em;
+		text-shadow: 0 2px 12px rgba(10, 15, 23, 0.8);
+	}
+	.banner-help {
+		margin: 0 0 16px;
+	}
+	.banner .toggles,
+	.banner .eyebrow a {
+		pointer-events: auto;
+	}
+	.banner-panel {
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-start;
+		padding-top: 24px;
+		padding-bottom: 24px;
+	}
+	.banner .panel {
+		pointer-events: auto;
+		width: 320px;
+		max-height: 100%;
+		overflow-y: auto;
+		background: rgba(17, 24, 36, 0.9);
+		backdrop-filter: blur(6px);
 	}
 	.eyebrow {
 		margin: 0 0 12px;
@@ -342,32 +396,12 @@ const cd = countries.find((c) => c.code === 'CD');
 	.local-pick select {
 		max-width: 100%;
 	}
-	.globe-head {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		gap: 16px;
-		flex-wrap: wrap;
-	}
 	.toggles {
 		display: flex;
 		gap: 8px;
-		margin-bottom: 16px;
-	}
-	.globe-grid {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) 340px;
-		gap: 16px;
-	}
-	.globe-box {
-		position: relative;
-		background: radial-gradient(circle at 50% 45%, #13213a, var(--bg) 70%);
-		border: 1px solid var(--border);
-		border-radius: var(--radius);
-		overflow: hidden;
 	}
 	#globe-canvas {
-		height: 560px;
+		height: 100%;
 		cursor: grab;
 	}
 	.globe-loading {
@@ -380,8 +414,9 @@ const cd = countries.find((c) => c.code === 'CD');
 	}
 	.legend {
 		position: absolute;
-		left: 12px;
-		bottom: 12px;
+		z-index: 1;
+		left: max(16px, calc((100% - 1200px) / 2 + 16px));
+		bottom: 16px;
 		list-style: none;
 		margin: 0;
 		padding: 10px 12px;
@@ -404,10 +439,6 @@ const cd = countries.find((c) => c.code === 'CD');
 	}
 	.legend span.dot {
 		border-radius: 50%;
-	}
-	.panel {
-		max-height: 560px;
-		overflow-y: auto;
 	}
 	.country-grid {
 		display: grid;
@@ -496,14 +527,48 @@ const cd = countries.find((c) => c.code === 'CD');
 		margin: 10px 0 0;
 	}
 	@media (max-width: 900px) {
-		.globe-grid {
-			grid-template-columns: 1fr;
+		/* On narrow screens the banner stacks: title, globe, then the panel. */
+		.banner {
+			height: auto;
+			overflow: visible;
+		}
+		.banner-text,
+		.banner-panel {
+			position: static;
+			pointer-events: auto;
+		}
+		.banner-text {
+			padding-top: 24px;
+		}
+		.banner-text > * {
+			max-width: none;
+		}
+		.stage {
+			position: relative;
 		}
 		#globe-canvas {
-			height: 420px;
+			height: min(420px, 100vw);
 		}
-		.panel {
+		.stage::after {
+			display: none;
+		}
+		.banner .panel {
+			width: 100%;
 			max-height: none;
+		}
+		.legend {
+			position: static;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px 14px;
+			margin: 0 16px;
+			padding: 0;
+			background: none;
+			border: 0;
+			font-size: 0.75rem;
+		}
+		.legend span {
+			margin-right: 6px;
 		}
 		.bar-col {
 			display: none;
