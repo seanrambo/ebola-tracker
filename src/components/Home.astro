@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import data from '../data/ebola.json';
 import { t, tr, fmt, fmtDate, cfr, countryName, localePath, type Lang } from '../i18n';
 import type { CountryRecord } from '../lib/outbreak';
+import { alertsEnabled } from '../lib/features';
 import isoCountries from 'i18n-iso-countries';
 
 interface Props {
@@ -101,18 +102,22 @@ const cd = countries.find((c) => c.code === 'CD');
 				</div>
 				<div id="local-body" aria-live="polite"></div>
 
-				<form class="alerts" id="alerts" novalidate>
-					<h3>{d.alerts.title}</h3>
-					<p class="muted small" id="alerts-intro">{d.alerts.introNoCountry}</p>
-					<div class="alerts-row">
-						<label class="sr-only" for="alert-email">{d.alerts.email}</label>
-						<input id="alert-email" name="email" type="email" autocomplete="email" required placeholder={d.alerts.email} />
-						<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
-						<button type="submit">{d.alerts.submit}</button>
-					</div>
-					<p class="small" id="alerts-msg" role="status"></p>
-					<p class="muted small">{d.alerts.privacy}</p>
-				</form>
+				{
+					alertsEnabled && (
+						<form class="alerts" id="alerts" novalidate>
+							<h3>{d.alerts.title}</h3>
+							<p class="muted small" id="alerts-intro">{d.alerts.introNoCountry}</p>
+							<div class="alerts-row">
+								<label class="sr-only" for="alert-email">{d.alerts.email}</label>
+								<input id="alert-email" name="email" type="email" autocomplete="email" required placeholder={d.alerts.email} />
+								<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+								<button type="submit">{d.alerts.submit}</button>
+							</div>
+							<p class="small" id="alerts-msg" role="status"></p>
+							<p class="muted small">{d.alerts.privacy}</p>
+						</form>
+					)
+				}
 			</div>
 		</div>
 	</section>

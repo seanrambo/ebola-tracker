@@ -346,21 +346,22 @@ function renderLocal(code: string | null, how: How) {
 	const select = document.getElementById('country-select') as HTMLSelectElement;
 	document.getElementById('local-detect')!.textContent = `${d.where.how[how]} ${d.where.changeHint}`;
 	currentCountry = code && [...select.options].some((o) => o.value === code) ? code : null;
-	const intro = document.getElementById('alerts-intro')!;
+	const intro = document.getElementById('alerts-intro');
 	if (!currentCountry) {
 		body.innerHTML = `<p class="muted">${d.where.prompt}</p>`;
-		intro.textContent = d.alerts.introNoCountry;
+		if (intro) intro.textContent = d.alerts.introNoCountry;
 		return;
 	}
 	select.value = currentCountry;
 	body.innerHTML = `${countryHtml(currentCountry, { compact: true })}<p><button class="link" data-show-globe="${currentCountry}">${d.where.showOnGlobe}</button></p>`;
-	intro.textContent = d.alerts.intro(countryName(currentCountry, lang));
+	if (intro) intro.textContent = d.alerts.intro(countryName(currentCountry, lang));
 }
 
 /* ---------------- Alerts sign-up ---------------- */
 
 function initAlertsForm() {
-	const form = document.getElementById('alerts') as HTMLFormElement;
+	const form = document.getElementById('alerts') as HTMLFormElement | null;
+	if (!form) return; // alerts are off until email is set up
 	const msg = document.getElementById('alerts-msg')!;
 	const button = form.querySelector('button')!;
 	const show = (text: string, kind: 'ok' | 'error') => {

@@ -39,7 +39,7 @@ Manual edits: change `src/data/ebola.json`, then run `npm run update-data -- --m
 
 ## Email alerts
 
-Subscriptions are stored in Netlify Blobs, and email is sent with [Resend](https://resend.com).
+Subscriptions are stored in Netlify Blobs, and email is sent with [Resend](https://resend.com). The sign-up form and the Alerts menu link appear only when `RESEND_API_KEY`, `ALERT_FROM` and `SUB_SECRET` are all set in Netlify. After adding them, trigger a new deploy.
 
 - `POST /api/subscribe` saves a pending subscription and sends a confirmation email. It is rate-limited to one email per address every 10 minutes and has a honeypot field to stop bots.
 - The links in emails open `/alerts/` pages, where a button calls `POST /api/confirm` or `POST /api/unsubscribe`. Email scanners that open links therefore can't confirm or unsubscribe anyone by accident. Mail clients get RFC 8058 one-click unsubscribe headers.
