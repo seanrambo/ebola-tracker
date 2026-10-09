@@ -1,5 +1,5 @@
 ---
-import { alertsEnabled } from '../lib/features';
+import { anyAlerts } from '../lib/features';
 import { LANGS, t, localePath, stripLocale, type Lang } from '../i18n';
 
 interface Props {
@@ -37,7 +37,7 @@ const site = Astro.site ?? Astro.url;
 				<nav>
 					<a href={`${localePath(lang, '/')}#globe`}>{d.nav.globe}</a>
 					<a href={`${localePath(lang, '/')}#guidance`}>{d.nav.guidance}</a>
-					{alertsEnabled && <a href={`${localePath(lang, '/')}#alerts`}>{d.nav.alerts}</a>}
+					{anyAlerts && <a href={`${localePath(lang, '/')}#alerts`}>{d.nav.alerts}</a>}
 					<a class="keep" href={localePath(lang, '/sources')}>{d.nav.sources}</a>
 				</nav>
 				<div class="lang-switch" role="group" aria-label={d.nav.language}>

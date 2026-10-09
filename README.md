@@ -1,6 +1,6 @@
 # Ebola Tracker
 
-An Astro site that tracks the 2026 Bundibugyo Ebola epidemic in English, Kiswahili and French. It shows the situation in the visitor's country, has an interactive globe (click a country or a province marker to see its cases), sends email alerts, and updates its figures automatically from WHO reports.
+An Astro site that tracks the 2026 Bundibugyo Ebola epidemic in English, Kiswahili and French. It shows the situation in the visitor's country, has an interactive globe (click a country or a province marker to see its cases), sends alerts by email and Telegram, and updates its figures automatically from WHO reports.
 
 ## Develop
 
@@ -45,6 +45,15 @@ Subscriptions are stored in Netlify Blobs, and email is sent with [Resend](https
 - The links in emails open `/alerts/` pages, where a button calls `POST /api/confirm` or `POST /api/unsubscribe`. Email scanners that open links therefore can't confirm or unsubscribe anyone by accident. Mail clients get RFC 8058 one-click unsubscribe headers.
 - `notify` runs hourly. It compares the live `/api/stats.json` with the last version it alerted on, and emails each confirmed subscriber about changes in their country or a neighbouring one, in their language.
 
+## Telegram alerts
+
+The "Get alerts on Telegram" button appears only when `TELEGRAM_BOT_TOKEN` is set in Netlify and Telegram accepts it at build time. Create a bot with [@BotFather](https://t.me/BotFather), add its token, and redeploy. Nothing else is needed: the `deploy-succeeded` function points the bot's webhook at `/api/telegram` and sets its command menu in all three languages. `notify` also checks the webhook every hour and restores it if it was lost.
+
+- The button opens the bot with the visitor's country and language (`?start=CD_sw`), so they are subscribed as soon as they press Start.
+- People can also type a country name in English, Kiswahili or French, or use `/status`, `/country`, `/stop`, `/help`, `/en`, `/sw` and `/fr`.
+- Subscribers are stored in the `telegram` Netlify Blobs store, keyed by chat ID. Webhook calls are checked against a secret token derived from the bot token.
+- `notify` sends Telegram alerts about the same changes as the emails. They go through a queue that stays under Telegram's rate limit and the 30-second function limit; whatever doesn't fit is sent on the next hourly run. Chats that blocked the bot are removed.
+
 ## Setup
 
 **Netlify** (Site configuration → Environment variables):
@@ -54,6 +63,7 @@ Subscriptions are stored in Netlify Blobs, and email is sent with [Resend](https
 | `RESEND_API_KEY` | API key from resend.com |
 | `ALERT_FROM` | Sender on a domain verified in Resend, e.g. `Ebola Tracker <alerts@yourdomain.org>` |
 | `SUB_SECRET` | Any long random string (e.g. `openssl rand -hex 32`); used to key subscriber records |
+| `TELEGRAM_BOT_TOKEN` | Optional. Token from @BotFather; turns on Telegram alerts. |
 | `SITE_URL` | Optional. Set it if you use a custom domain; otherwise Netlify's own URL is used. |
 
 **GitHub** (Settings → Secrets and variables → Actions): add `ANTHROPIC_API_KEY`.
@@ -63,3 +73,4 @@ Subscriptions are stored in Netlify Blobs, and email is sent with [Resend](https
 - `/api/stats.json` and `/api/stats.csv`: open data (CORS enabled)
 - `/api/geo`: Netlify Edge Function that returns the visitor's country code
 - `/api/subscribe`, `/api/confirm`, `/api/unsubscribe`: email alerts
+- `/api/telegram`: Telegram bot webhook

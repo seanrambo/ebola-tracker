@@ -209,6 +209,32 @@ const en = {
 		unsubscribe: 'Unsubscribe',
 		footer: 'You are getting this because you subscribed to Ebola Tracker alerts.',
 	},
+	telegram: {
+		title: 'Get alerts',
+		intro: (country: string) => `Get a message when new cases are reported in ${country} or a neighbouring country.`,
+		introNoCountry: 'Choose your country above to get alerts when cases are reported there or next door.',
+		button: 'Get alerts on Telegram',
+		note: 'Free and instant in the Telegram app. Open the bot and press Start.',
+		orEmail: 'Or get them by email:',
+		welcome:
+			'Hello! I send a message when new Ebola cases are reported in your country or a neighbouring country.\n\nWhich country are you in? Send its name, for example <i>Kenya</i>.',
+		askCountry: 'Send the name of your country, for example <i>Uganda</i>.',
+		subscribed: (country: string) =>
+			`Done. You will get alerts for <b>${country}</b> and its neighbours.\n\n/status shows the latest figures. /stop ends the alerts.`,
+		notFound: (text: string) => `I couldn't find a country called "${text}". Please send the full name, for example <i>Rwanda</i>.`,
+		stopped: 'Alerts stopped and your details deleted. Send /start to subscribe again.',
+		notSubscribed: "You haven't chosen a country yet. Send its name to start getting alerts.",
+		help: 'I send alerts when Ebola cases are reported in your country or next door.\n\n/status – latest figures for your country\n/country – change your country\n/en /sw /fr – change language\n/stop – stop alerts',
+		languageSet: 'I will write to you in English.',
+		figures: (confirmed: string, deaths: string, date: string) => `${confirmed} confirmed cases, ${deaths} deaths (as of ${date}).`,
+		alertFooter: 'Send /stop to stop these alerts.',
+		commands: {
+			status: 'Latest figures for your country',
+			country: 'Change your country',
+			stop: 'Stop alerts',
+			help: 'How this bot works',
+		},
+	},
 	sources: {
 		title: 'Sources & method',
 		updated: (date: string) => `Data last updated ${date}.`,

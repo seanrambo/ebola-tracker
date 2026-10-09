@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import data from '../data/ebola.json';
 import { t, tr, fmt, fmtDate, cfr, countryName, localePath, type Lang } from '../i18n';
 import type { CountryRecord } from '../lib/outbreak';
-import { alertsEnabled } from '../lib/features';
+import { alertsEnabled, anyAlerts, telegramBot } from '../lib/features';
 import isoCountries from 'i18n-iso-countries';
 
 interface Props {
@@ -103,19 +103,37 @@ const cd = countries.find((c) => c.code === 'CD');
 				<div id="local-body" aria-live="polite"></div>
 
 				{
-					alertsEnabled && (
-						<form class="alerts" id="alerts" novalidate>
-							<h3>{d.alerts.title}</h3>
-							<p class="muted small" id="alerts-intro">{d.alerts.introNoCountry}</p>
-							<div class="alerts-row">
-								<label class="sr-only" for="alert-email">{d.alerts.email}</label>
-								<input id="alert-email" name="email" type="email" autocomplete="email" required placeholder={d.alerts.email} />
-								<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
-								<button type="submit">{d.alerts.submit}</button>
-							</div>
-							<p class="small" id="alerts-msg" role="status"></p>
-							<p class="muted small">{d.alerts.privacy}</p>
-						</form>
+					anyAlerts && (
+						<div class="alerts" id="alerts">
+							<h3>{telegramBot ? d.telegram.title : d.alerts.title}</h3>
+							<p class="muted small" id="alerts-intro" data-channel={telegramBot ? 'telegram' : 'email'}>
+								{telegramBot ? d.telegram.introNoCountry : d.alerts.introNoCountry}
+							</p>
+							{telegramBot && (
+								<p class="tg">
+									<a class="tg-btn" id="tg-link" href={`https://t.me/${telegramBot}?start=${lang}`} target="_blank" rel="noopener">
+										<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+											<path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1-1 .2-1.5L20.5 2.9c.9-.3 1.6.2 1.4 1.4Z" />
+										</svg>
+										{d.telegram.button}
+									</a>
+									<span class="muted small">{d.telegram.note}</span>
+								</p>
+							)}
+							{alertsEnabled && (
+								<form id="alerts-form" novalidate>
+									{telegramBot && <p class="small or">{d.telegram.orEmail}</p>}
+									<div class="alerts-row">
+										<label class="sr-only" for="alert-email">{d.alerts.email}</label>
+										<input id="alert-email" name="email" type="email" autocomplete="email" required placeholder={d.alerts.email} />
+										<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+										<button type="submit">{d.alerts.submit}</button>
+									</div>
+									<p class="small" id="alerts-msg" role="status"></p>
+									<p class="muted small">{d.alerts.privacy}</p>
+								</form>
+							)}
+						</div>
 					)
 				}
 			</div>
@@ -586,6 +604,30 @@ const cd = countries.find((c) => c.code === 'CD');
 	}
 	.alerts h3 {
 		margin: 0 0 4px;
+	}
+	.tg {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px 14px;
+		margin: 12px 0 0;
+	}
+	.tg-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: #2aabee;
+		color: #fff;
+		font-weight: 600;
+		text-decoration: none;
+		padding: 10px 16px;
+		border-radius: 8px;
+	}
+	.tg-btn:hover {
+		background: #229ed9;
+	}
+	.or {
+		margin: 16px 0 0;
 	}
 	.alerts-row {
 		display: flex;

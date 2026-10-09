@@ -211,6 +211,32 @@ const sw: Dict = {
 		unsubscribe: 'Jiondoe',
 		footer: 'Unapokea barua pepe hii kwa sababu ulijiandikisha kupata arifa za Kifuatiliaji cha Ebola.',
 	},
+	telegram: {
+		title: 'Pata arifa',
+		intro: (country) => `Pata ujumbe wagonjwa wapya wakiripotiwa nchini ${country} au nchi jirani.`,
+		introNoCountry: 'Chagua nchi yako hapo juu ili upate arifa wagonjwa wakiripotiwa huko au nchi jirani.',
+		button: 'Pata arifa kwenye Telegram',
+		note: 'Bure na papo hapo kwenye programu ya Telegram. Fungua bot kisha bonyeza Start.',
+		orEmail: 'Au zipate kwa barua pepe:',
+		welcome:
+			'Habari! Ninatuma ujumbe wagonjwa wapya wa Ebola wakiripotiwa nchini kwako au katika nchi jirani.\n\nUko nchi gani? Tuma jina lake, kwa mfano <i>Kenya</i>.',
+		askCountry: 'Tuma jina la nchi yako, kwa mfano <i>Uganda</i>.',
+		subscribed: (country) =>
+			`Tayari. Utapata arifa za <b>${country}</b> na nchi jirani.\n\n/status inaonyesha takwimu za karibuni. /stop inasitisha arifa.`,
+		notFound: (text) => `Sikupata nchi inayoitwa "${text}". Tafadhali tuma jina kamili, kwa mfano <i>Rwanda</i>.`,
+		stopped: 'Arifa zimesitishwa na taarifa zako zimefutwa. Tuma /start kujiandikisha tena.',
+		notSubscribed: 'Bado hujachagua nchi. Tuma jina lake ili uanze kupata arifa.',
+		help: 'Ninatuma arifa wagonjwa wa Ebola wakiripotiwa nchini kwako au nchi jirani.\n\n/status – takwimu za karibuni za nchi yako\n/country – badilisha nchi\n/en /sw /fr – badilisha lugha\n/stop – sitisha arifa',
+		languageSet: 'Nitakuandikia kwa Kiswahili.',
+		figures: (confirmed, deaths, date) => `Wagonjwa ${confirmed} waliothibitishwa, vifo ${deaths} (hadi ${date}).`,
+		alertFooter: 'Tuma /stop kusitisha arifa hizi.',
+		commands: {
+			status: 'Takwimu za karibuni za nchi yako',
+			country: 'Badilisha nchi yako',
+			stop: 'Sitisha arifa',
+			help: 'Jinsi bot hii inavyofanya kazi',
+		},
+	},
 	sources: {
 		title: 'Vyanzo na mbinu',
 		updated: (date) => `Takwimu zimesasishwa mwisho ${date}.`,

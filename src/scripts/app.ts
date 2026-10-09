@@ -1,6 +1,7 @@
 import data from '../data/ebola.json';
-import { t, tr, fmt, fmtDate, cfr, countryName, listJoin, isLang, type Lang } from '../i18n';
-import { affectedNeighbours, statusOf, type CountryRecord, type RegionRecord, type Status } from '../lib/outbreak';
+import { t, tr, fmt, fmtDate, cfr, countryName, isLang, type Lang } from '../i18n';
+import { adviceFor } from '../lib/advice';
+import { statusOf, type CountryRecord, type RegionRecord, type Status } from '../lib/outbreak';
 
 type Past = (typeof data.history)[number];
 
@@ -23,22 +24,7 @@ const name = (code: string) => esc(countryName(code, lang));
 const n = (v: number | null | undefined) => fmt(v, lang);
 const date = (iso: string) => fmtDate(iso, lang);
 
-function advice(code: string): string {
-	const near = listJoin(affectedNeighbours(code, countries).map((c) => name(c.code)), lang);
-	const status = statusOf(code, countries);
-	switch (status) {
-		case 'active':
-			return d.advice.active(name(code));
-		case 'imported':
-			return d.advice.imported(name(code));
-		case 'ended':
-			return d.advice.ended(name(code)) + (near ? d.advice.endedNear(near) : '');
-		case 'monitoring':
-			return d.advice.monitoring(name(code), near);
-		default:
-			return d.advice.none(name(code));
-	}
-}
+const advice = (code: string) => adviceFor(code, countries, lang);
 
 function statGrid(c: CountryRecord) {
 	const cells: [string, number | null][] = [
@@ -347,20 +333,28 @@ function renderLocal(code: string | null, how: How) {
 	document.getElementById('local-detect')!.textContent = `${d.where.how[how]} ${d.where.changeHint}`;
 	currentCountry = code && [...select.options].some((o) => o.value === code) ? code : null;
 	const intro = document.getElementById('alerts-intro');
+	const viaTelegram = intro?.dataset.channel === 'telegram';
+	const tgLink = document.getElementById('tg-link') as HTMLAnchorElement | null;
+	if (tgLink) {
+		// The bot reads this start parameter and subscribes to this country straight away.
+		const url = new URL(tgLink.href);
+		url.searchParams.set('start', currentCountry ? `${currentCountry}_${lang}` : lang);
+		tgLink.href = url.toString();
+	}
 	if (!currentCountry) {
 		body.innerHTML = `<p class="muted">${d.where.prompt}</p>`;
-		if (intro) intro.textContent = d.alerts.introNoCountry;
+		if (intro) intro.textContent = viaTelegram ? d.telegram.introNoCountry : d.alerts.introNoCountry;
 		return;
 	}
 	select.value = currentCountry;
 	body.innerHTML = `${countryHtml(currentCountry, { compact: true })}<p><button class="link" data-show-globe="${currentCountry}">${d.where.showOnGlobe}</button></p>`;
-	if (intro) intro.textContent = d.alerts.intro(countryName(currentCountry, lang));
+	if (intro) intro.textContent = (viaTelegram ? d.telegram.intro : d.alerts.intro)(countryName(currentCountry, lang));
 }
 
 /* ---------------- Alerts sign-up ---------------- */
 
 function initAlertsForm() {
-	const form = document.getElementById('alerts') as HTMLFormElement | null;
+	const form = document.getElementById('alerts-form') as HTMLFormElement | null;
 	if (!form) return; // alerts are off until email is set up
 	const msg = document.getElementById('alerts-msg')!;
 	const button = form.querySelector('button')!;

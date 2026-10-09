@@ -212,6 +212,32 @@ const fr: Dict = {
 		unsubscribe: 'Se désabonner',
 		footer: 'Vous recevez cet e-mail car vous êtes abonné aux alertes du Suivi Ebola.',
 	},
+	telegram: {
+		title: 'Recevoir des alertes',
+		intro: (country) => `Recevez un message quand de nouveaux cas sont signalés en ${country} ou dans un pays voisin.`,
+		introNoCountry: 'Choisissez votre pays ci-dessus pour recevoir des alertes quand des cas y sont signalés ou dans un pays voisin.',
+		button: 'Recevoir les alertes sur Telegram',
+		note: "Gratuit et instantané dans l'application Telegram. Ouvrez le bot et appuyez sur Démarrer.",
+		orEmail: 'Ou par e-mail :',
+		welcome:
+			"Bonjour ! J'envoie un message quand de nouveaux cas d'Ebola sont signalés dans votre pays ou dans un pays voisin.\n\nDans quel pays êtes-vous ? Envoyez son nom, par exemple <i>Kenya</i>.",
+		askCountry: 'Envoyez le nom de votre pays, par exemple <i>Ouganda</i>.',
+		subscribed: (country) =>
+			`C'est fait. Vous recevrez les alertes pour <b>${country}</b> et ses voisins.\n\n/status affiche les derniers chiffres. /stop arrête les alertes.`,
+		notFound: (text) => `Je n'ai pas trouvé de pays appelé « ${text} ». Envoyez le nom complet, par exemple <i>Rwanda</i>.`,
+		stopped: 'Alertes arrêtées et données supprimées. Envoyez /start pour vous réabonner.',
+		notSubscribed: "Vous n'avez pas encore choisi de pays. Envoyez son nom pour recevoir les alertes.",
+		help: "J'envoie des alertes quand des cas d'Ebola sont signalés dans votre pays ou un pays voisin.\n\n/status – derniers chiffres pour votre pays\n/country – changer de pays\n/en /sw /fr – changer de langue\n/stop – arrêter les alertes",
+		languageSet: 'Je vous écrirai en français.',
+		figures: (confirmed, deaths, date) => `${confirmed} cas confirmés, ${deaths} décès (au ${date}).`,
+		alertFooter: 'Envoyez /stop pour arrêter ces alertes.',
+		commands: {
+			status: 'Derniers chiffres pour votre pays',
+			country: 'Changer de pays',
+			stop: 'Arrêter les alertes',
+			help: 'Comment fonctionne ce bot',
+		},
+	},
 	sources: {
 		title: 'Sources et méthode',
 		updated: (date) => `Dernière mise à jour des données : ${date}.`,
