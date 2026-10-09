@@ -1,0 +1,11 @@
+---
+import Alerts from '../../components/Alerts.astro';
+import type { Lang } from '../../i18n';
+
+export function getStaticPaths() {
+	return [{ params: { lang: 'sw' } }, { params: { lang: 'fr' } }];
+}
+const lang = Astro.params.lang as Lang;
+---
+
+<Alerts lang={lang} />

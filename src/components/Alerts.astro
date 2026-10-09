@@ -1,0 +1,81 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, localePath, type Lang } from '../i18n';
+
+interface Props {
+	lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang);
+---
+
+<Base title={d.meta.alertsTitle} description={d.meta.alertsTitle} lang={lang}>
+	<section>
+		<div class="wrap narrow">
+			<div class="card">
+				<h1>{d.alerts.resultTitle}</h1>
+				<div data-state="confirm" hidden>
+					<p>{d.alerts.confirmPrompt}</p>
+					<p><button data-action="/api/confirm" data-done="confirmed">{d.email.confirmButton}</button></p>
+				</div>
+				<div data-state="unsubscribe" hidden>
+					<p>{d.alerts.unsubPrompt}</p>
+					<p><button data-action="/api/unsubscribe" data-done="unsubscribed">{d.alerts.unsubButton}</button></p>
+				</div>
+				{
+					Object.entries(d.alerts.results).map(([key, text]) => (
+						<p class="result" data-state={key} hidden>
+							{text}
+						</p>
+					))
+				}
+				<p class="error" data-state="error" hidden>{d.alerts.error}</p>
+				<p><a href={localePath(lang, '/')}>{d.alerts.back}</a></p>
+			</div>
+		</div>
+	</section>
+</Base>
+
+<script>
+	const params = new URLSearchParams(location.search);
+	const id = params.get('id');
+	const token = params.get('t');
+
+	function show(state: string) {
+		document.querySelectorAll<HTMLElement>('[data-state]').forEach((el) => (el.hidden = el.dataset.state !== state));
+	}
+
+	const initial = params.get('s') ?? 'invalid';
+	const needsToken = initial === 'confirm' || initial === 'unsubscribe';
+	show(needsToken && !(id && token) ? 'invalid' : document.querySelector(`[data-state="${CSS.escape(initial)}"]`) ? initial : 'invalid');
+
+	document.querySelectorAll<HTMLButtonElement>('button[data-action]').forEach((button) =>
+		button.addEventListener('click', async () => {
+			button.disabled = true;
+			try {
+				const res = await fetch(button.dataset.action!, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ id, t: token }),
+				});
+				show(res.ok ? button.dataset.done! : res.status === 400 ? 'invalid' : 'error');
+			} catch {
+				show('error');
+			} finally {
+				button.disabled = false;
+			}
+		}),
+	);
+</script>
+
+<style>
+	.narrow {
+		max-width: 560px;
+	}
+	.result {
+		font-size: 1.1rem;
+	}
+	.error {
+		color: var(--active);
+	}
+</style>

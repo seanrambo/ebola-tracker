@@ -1,0 +1,66 @@
+name: Update outbreak data
+
+on:
+  schedule:
+    - cron: '17 */6 * * *' # every 6 hours
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Re-read the latest WHO reports even if they were processed before
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check WHO for new reports
+        id: update
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/update-data.mjs ${{ inputs.force && '--force' || '' }}
+
+      - name: Make sure the site still builds
+        if: steps.update.outputs.changed == 'true'
+        run: npm run build
+
+      - name: Commit and push
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          git config user.name "ebola-tracker-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data
+          git diff --cached --quiet && exit 0
+          git commit -m "${{ steps.update.outputs.summary && fromJSON(steps.update.outputs.summary) || 'Record latest WHO report check' }}"
+          git push
+
+      - name: Open an issue for review
+        if: failure() && steps.update.outputs.rejected == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create data-review --color D93F0B --description "Automatic data update needs a human" 2>/dev/null || true
+          existing=$(gh issue list --label data-review --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file update-report.md
+          else
+            gh issue create --title "Automatic data update needs review" --label data-review --body-file update-report.md
+          fi

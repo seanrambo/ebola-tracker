@@ -1,13 +1,19 @@
 ---
+import { LANGS, t, localePath, stripLocale, type Lang } from '../i18n';
+
 interface Props {
 	title: string;
 	description: string;
+	lang: Lang;
 }
-const { title, description } = Astro.props;
+const { title, description, lang } = Astro.props;
+const d = t(lang);
+const page = stripLocale(Astro.url.pathname);
+const site = Astro.site ?? Astro.url;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,21 +22,32 @@ const { title, description } = Astro.props;
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta name="theme-color" content="#0a0f17" />
+		{LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(localePath(l, page), site).href} />)}
+		<link rel="alternate" hreflang="x-default" href={new URL(page, site).href} />
 		<title>{title}</title>
 	</head>
 	<body>
 		<header class="site-header">
 			<div class="wrap header-inner">
-				<a href="/" class="brand">
+				<a href={localePath(lang, '/')} class="brand">
 					<span class="brand-dot" aria-hidden="true"></span>
-					Ebola Tracker
+					<span class="brand-name">Ebola Tracker</span>
 				</a>
 				<nav>
-					<a href="/#globe">Globe</a>
-					<a href="/#guidance">Guidance</a>
-					<a href="/#history">History</a>
-					<a href="/sources">Sources</a>
+					<a href={`${localePath(lang, '/')}#globe`}>{d.nav.globe}</a>
+					<a href={`${localePath(lang, '/')}#guidance`}>{d.nav.guidance}</a>
+					<a href={`${localePath(lang, '/')}#alerts`}>{d.nav.alerts}</a>
+					<a href={localePath(lang, '/sources')}>{d.nav.sources}</a>
 				</nav>
+				<div class="lang-switch" role="group" aria-label={d.nav.language}>
+					{
+						LANGS.map((l) => (
+							<a href={localePath(l, page)} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined} title={t(l).langName}>
+								{l.toUpperCase()}
+							</a>
+						))
+					}
+				</div>
 			</div>
 		</header>
 		<main>
@@ -38,13 +55,10 @@ const { title, description } = Astro.props;
 		</main>
 		<footer class="site-footer">
 			<div class="wrap">
+				<p>{d.footer.disclaimer}</p>
 				<p>
-					This site is for information only and is not medical advice. If you have symptoms, contact your national
-					health ministry or a health worker. Figures come from public reports and can lag behind events.
-				</p>
-				<p>
-					<a href="/sources">Sources &amp; method</a> · <a href="/api/stats.json">JSON</a> ·
-					<a href="/api/stats.csv">CSV</a>
+					<a href={localePath(lang, '/sources')}>{d.footer.sources}</a> · <a href="/api/stats.json">JSON</a> ·
+					<a href="/api/stats.csv">CSV</a> · <a href="https://github.com/seanrambo/ebola-tracker">GitHub</a>
 				</p>
 			</div>
 		</footer>
@@ -190,6 +204,20 @@ const { title, description } = Astro.props;
 		border-color: var(--accent);
 	}
 
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
+	}
+	input,
+	select,
+	button {
+		font: inherit;
+	}
+
 	/* Content rendered by src/scripts/app.ts */
 	.small {
 		font-size: 0.875rem;
@@ -316,8 +344,34 @@ const { title, description } = Astro.props;
 		color: var(--muted);
 		font-size: 0.9rem;
 	}
-	@media (max-width: 560px) {
+	.site-header nav {
+		margin-left: auto;
+	}
+	.lang-switch {
+		display: flex;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		overflow: hidden;
+		flex-shrink: 0;
+	}
+	.lang-switch a {
+		padding: 4px 8px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--muted);
+		text-decoration: none;
+	}
+	.lang-switch a[aria-current='true'] {
+		background: var(--accent);
+		color: #04121d;
+	}
+	@media (max-width: 720px) {
 		.site-header nav a:nth-child(-n + 3) {
+			display: none;
+		}
+	}
+	@media (max-width: 400px) {
+		.brand-name {
 			display: none;
 		}
 	}

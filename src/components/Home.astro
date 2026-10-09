@@ -1,0 +1,552 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/ebola.json';
+import { t, tr, fmt, fmtDate, cfr, countryName, localePath, type Lang } from '../i18n';
+import type { CountryRecord } from '../lib/outbreak';
+import isoCountries from 'i18n-iso-countries';
+
+interface Props {
+	lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang);
+const countries = data.countries as CountryRecord[];
+
+const collator = new Intl.Collator(lang);
+const countryOptions = Object.keys(isoCountries.getAlpha2Codes())
+	.map((code) => ({ code, name: countryName(code, lang) }))
+	.sort((a, b) => collator.compare(a.name, b.name));
+
+const totals = countries.reduce(
+	(acc, c) => ({ confirmed: acc.confirmed + c.confirmed, deaths: acc.deaths + c.deaths }),
+	{ confirmed: 0, deaths: 0 },
+);
+const latestAsOf = countries.map((c) => c.asOf).sort().at(-1)!;
+const whoCurrent = data.who.asOf >= latestAsOf && data.who.confirmed === totals.confirmed;
+const activeCount = countries.filter((c) => c.status === 'active' || c.status === 'imported').length;
+const regions = [...data.regions].sort((a, b) => b.confirmed - a.confirmed);
+const history = [...data.history].sort((a, b) => b.year - a.year || b.cases - a.cases);
+const cd = countries.find((c) => c.code === 'CD');
+---
+
+<Base title={d.meta.title} description={d.meta.description} lang={lang}>
+	<section class="hero">
+		<div class="wrap">
+			<p class="eyebrow"><span class="badge" data-status="active">{d.hero.badge}</span></p>
+			<h1>{d.hero.title}</h1>
+			<p class="lede">{tr(data.epidemic.summary, lang)}</p>
+			<p class="muted small">
+				{d.hero.updated(fmtDate(data.updated, lang))} · <a href={localePath(lang, '/sources')}>{d.hero.howWeCount}</a>
+			</p>
+
+			<div class="kpis">
+				<div class="kpi"><span class="kpi-v num">{fmt(totals.confirmed, lang)}</span><span class="kpi-l">{d.hero.kpiConfirmed}</span></div>
+				<div class="kpi"><span class="kpi-v num" style="color: var(--active)">{fmt(totals.deaths, lang)}</span><span class="kpi-l">{d.hero.kpiDeaths}</span></div>
+				<div class="kpi"><span class="kpi-v num">{cfr(totals.deaths, totals.confirmed, lang)}</span><span class="kpi-l">{d.hero.kpiCfr}</span></div>
+				<div class="kpi"><span class="kpi-v num">{countries.length}</span><span class="kpi-l">{d.hero.kpiCountries}</span></div>
+				<div class="kpi"><span class="kpi-v num">{activeCount}</span><span class="kpi-l">{d.hero.kpiActive}</span></div>
+			</div>
+			<p class="muted small">
+				{
+					whoCurrent
+						? d.hero.whoMatch(fmtDate(data.who.asOf, lang))
+						: d.hero.whoLag(fmt(data.who.confirmed, lang), fmt(data.who.deaths, lang), fmtDate(data.who.asOf, lang))
+				}{' '}
+				(<a href={data.who.url}>WHO</a>)
+			</p>
+		</div>
+	</section>
+
+	<section id="where" class="tight">
+		<div class="wrap">
+			<div class="card local" id="local">
+				<div class="local-head">
+					<div>
+						<h2>{d.where.title}</h2>
+						<p class="muted small" id="local-detect">{d.where.detecting}</p>
+					</div>
+					<label class="local-pick">
+						<span class="muted small">{d.where.change}</span>
+						<select id="country-select">
+							<option value="">{d.where.choose}</option>
+							{countryOptions.map((c) => <option value={c.code}>{c.name}</option>)}
+						</select>
+					</label>
+				</div>
+				<div id="local-body" aria-live="polite"></div>
+
+				<form class="alerts" id="alerts" novalidate>
+					<h3>{d.alerts.title}</h3>
+					<p class="muted small" id="alerts-intro">{d.alerts.introNoCountry}</p>
+					<div class="alerts-row">
+						<label class="sr-only" for="alert-email">{d.alerts.email}</label>
+						<input id="alert-email" name="email" type="email" autocomplete="email" required placeholder={d.alerts.email} />
+						<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+						<button type="submit">{d.alerts.submit}</button>
+					</div>
+					<p class="small" id="alerts-msg" role="status"></p>
+					<p class="muted small">{d.alerts.privacy}</p>
+				</form>
+			</div>
+		</div>
+	</section>
+
+	<section id="globe">
+		<div class="wrap">
+			<div class="globe-head">
+				<div>
+					<h2>{d.globe.title}</h2>
+					<p class="muted">{d.globe.help}</p>
+				</div>
+				<div class="toggles" role="group" aria-label={d.globe.layers}>
+					<button id="layer-current" aria-pressed="true">{d.globe.current}</button>
+					<button id="layer-history" aria-pressed="false">{d.globe.past}</button>
+				</div>
+			</div>
+			<div class="globe-grid">
+				<div class="globe-box">
+					<div id="globe-canvas" aria-label={d.globe.aria}></div>
+					<p class="globe-loading muted" id="globe-loading">{d.globe.loading}</p>
+					<ul class="legend">
+						<li><span style="--c: var(--active)"></span>{d.status.active}</li>
+						<li><span style="--c: var(--imported)"></span>{d.status.imported}</li>
+						<li><span style="--c: var(--ended)"></span>{d.status.ended}</li>
+						<li><span style="--c: var(--monitoring)"></span>{d.status.monitoring}</li>
+						<li><span class="dot" style="--c: #ffd166"></span>{d.globe.legendPast}</li>
+					</ul>
+				</div>
+				<aside class="card panel" id="panel" aria-live="polite">
+					<p class="muted">{d.panel.placeholder}</p>
+				</aside>
+			</div>
+		</div>
+	</section>
+
+	<section id="now">
+		<div class="wrap">
+			<h2>{d.now.title}</h2>
+			<div class="country-grid">
+				{
+					countries.map((c) => (
+						<button class="card country-card" data-country={c.code}>
+							<span class="cc-top">
+								<strong>{countryName(c.code, lang)}</strong>
+								<span class="badge" data-status={c.status}>
+									{d.status[c.status]}
+								</span>
+							</span>
+							<span class="cc-stats">
+								<span>
+									<b class="num">{fmt(c.confirmed, lang)}</b> {d.now.confirmed}
+								</span>
+								<span>
+									<b class="num">{fmt(c.deaths, lang)}</b> {d.now.deaths}
+								</span>
+							</span>
+							<span class="muted small">
+								{d.virus[c.virus]} · {d.panel.asOf(fmtDate(c.asOf, lang))}
+							</span>
+						</button>
+					))
+				}
+			</div>
+
+			<h3 class="sub">{d.now.provinceTitle}</h3>
+			<div class="card table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>{d.now.province}</th>
+							<th class="r">{d.stats.confirmed}</th>
+							<th class="r">{d.stats.deaths}</th>
+							<th class="r">{d.stats.cfr}</th>
+							<th class="bar-col"></th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							regions.map((r) => (
+								<tr>
+									<td>{tr(r.name, lang)}</td>
+									<td class="r num">{fmt(r.confirmed, lang)}</td>
+									<td class="r num">{fmt(r.deaths, lang)}</td>
+									<td class="r num">{cfr(r.deaths, r.confirmed, lang)}</td>
+									<td class="bar-col">
+										<span class="bar" style={`width:${Math.max(1, (r.confirmed / regions[0].confirmed) * 100)}%`} />
+									</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+			<p class="muted small">{d.now.provinceNote(fmtDate(cd?.asOf ?? data.updated, lang))}</p>
+
+			<h3 class="sub">{d.now.timeline}</h3>
+			<ol class="timeline">
+				{
+					[...data.timeline].reverse().map((e) => (
+						<li>
+							<time datetime={e.date}>{fmtDate(e.date, lang)}</time>
+							<span>{tr(e.text, lang)}</span>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<section id="guidance">
+		<div class="wrap">
+			<h2>{d.guide.title}</h2>
+			<div class="guide-grid">
+				<div class="card">
+					<h3>{d.guide.symptomsTitle}</h3>
+					<p>{d.guide.symptomsIntro}</p>
+					<ul>{d.guide.symptoms.map((s) => <li>{s}</li>)}</ul>
+				</div>
+				<div class="card">
+					<h3>{d.guide.spreadTitle}</h3>
+					<ul>{d.guide.spread.map((s) => <li>{s}</li>)}</ul>
+				</div>
+				<div class="card">
+					<h3>{d.guide.todoTitle}</h3>
+					<ul>{d.guide.todo.map((s) => <li set:html={s} />)}</ul>
+				</div>
+			</div>
+
+			<h3 class="sub">{d.guide.rumoursTitle}</h3>
+			<div class="rumours">
+				{
+					d.guide.rumours.map((r) => (
+						<details class="card">
+							<summary>{r.q}</summary>
+							<p>{r.a}</p>
+						</details>
+					))
+				}
+			</div>
+			<p class="muted small" set:html={d.guide.basedOn} />
+		</div>
+	</section>
+
+	<section id="history">
+		<div class="wrap">
+			<h2>{d.history.title}</h2>
+			<p class="muted">{d.history.hint}</p>
+			<div class="card table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>{d.history.year}</th>
+							<th>{d.history.place}</th>
+							<th>{d.history.virus}</th>
+							<th class="r">{d.stats.cases}</th>
+							<th class="r">{d.stats.deaths}</th>
+							<th class="r">{d.stats.cfr}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							history.map((h) => (
+								<tr>
+									<td class="num">{h.year}</td>
+									<td>
+										{tr(h.place, lang)} <span class="muted">· {countryName(h.country, lang)}</span>
+									</td>
+									<td class="muted">{d.virus[h.virus]}</td>
+									<td class="r num">{fmt(h.cases, lang)}</td>
+									<td class="r num">{fmt(h.deaths, lang)}</td>
+									<td class="r num">{cfr(h.deaths, h.cases, lang)}</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+			<p class="muted small">{d.history.source}</p>
+		</div>
+	</section>
+</Base>
+
+<script>
+	import { initApp } from '../scripts/app';
+	initApp();
+</script>
+
+<style>
+	.hero {
+		padding: 48px 0 24px;
+		background: radial-gradient(ellipse at top, rgba(229, 72, 77, 0.12), transparent 60%);
+	}
+	.hero h1 {
+		font-size: clamp(1.8rem, 4vw, 2.8rem);
+		letter-spacing: -0.02em;
+	}
+	.eyebrow {
+		margin: 0 0 12px;
+	}
+	.eyebrow .badge {
+		white-space: normal;
+		border-radius: 12px;
+	}
+	.lede {
+		max-width: 760px;
+		font-size: 1.05rem;
+	}
+	.small {
+		font-size: 0.875rem;
+	}
+	.kpis {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		gap: 12px;
+		margin: 24px 0 12px;
+	}
+	.kpi {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: 16px;
+		display: flex;
+		flex-direction: column;
+	}
+	.kpi-v {
+		font-size: 1.8rem;
+		font-weight: 700;
+	}
+	.kpi-l {
+		color: var(--muted);
+		font-size: 0.85rem;
+	}
+	section.tight {
+		padding: 8px 0;
+	}
+	.local-head {
+		display: flex;
+		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
+		align-items: flex-start;
+	}
+	.local-head h2 {
+		margin: 0;
+	}
+	.local-pick {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		min-width: 0;
+		max-width: 100%;
+	}
+	.local-pick select {
+		max-width: 100%;
+	}
+	.globe-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+	.toggles {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+	.globe-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 340px;
+		gap: 16px;
+	}
+	.globe-box {
+		position: relative;
+		background: radial-gradient(circle at 50% 45%, #13213a, var(--bg) 70%);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		overflow: hidden;
+	}
+	#globe-canvas {
+		height: 560px;
+		cursor: grab;
+	}
+	.globe-loading {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		margin: 0;
+		pointer-events: none;
+	}
+	.legend {
+		position: absolute;
+		left: 12px;
+		bottom: 12px;
+		list-style: none;
+		margin: 0;
+		padding: 10px 12px;
+		background: rgba(10, 15, 23, 0.8);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		font-size: 0.8rem;
+		display: grid;
+		gap: 4px;
+		pointer-events: none;
+	}
+	.legend span {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		border-radius: 3px;
+		background: var(--c);
+		margin-right: 8px;
+		vertical-align: -2px;
+	}
+	.legend span.dot {
+		border-radius: 50%;
+	}
+	.panel {
+		max-height: 560px;
+		overflow-y: auto;
+	}
+	.country-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+		gap: 12px;
+	}
+	.country-card {
+		text-align: left;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 16px;
+	}
+	.cc-top {
+		display: flex;
+		justify-content: space-between;
+		gap: 8px;
+		align-items: flex-start;
+	}
+	.cc-stats {
+		display: flex;
+		gap: 16px;
+	}
+	.sub {
+		margin-top: 32px;
+	}
+	.bar-col {
+		width: 30%;
+	}
+	.bar {
+		display: block;
+		height: 8px;
+		border-radius: 4px;
+		background: var(--active);
+	}
+	.timeline {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		border-left: 2px solid var(--border);
+	}
+	.timeline li {
+		position: relative;
+		padding: 0 0 16px 20px;
+		display: grid;
+		gap: 2px;
+	}
+	.timeline li::before {
+		content: '';
+		position: absolute;
+		left: -6px;
+		top: 6px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--active);
+	}
+	.timeline time {
+		color: var(--muted);
+		font-size: 0.85rem;
+	}
+	.guide-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 12px;
+	}
+	.guide-grid ul {
+		padding-left: 1.2em;
+		margin: 0;
+	}
+	.guide-grid li {
+		margin-bottom: 6px;
+	}
+	.rumours {
+		display: grid;
+		gap: 8px;
+	}
+	.rumours details {
+		padding: 14px 18px;
+	}
+	.rumours summary {
+		cursor: pointer;
+		font-weight: 600;
+	}
+	.rumours p {
+		margin: 10px 0 0;
+	}
+	@media (max-width: 900px) {
+		.globe-grid {
+			grid-template-columns: 1fr;
+		}
+		#globe-canvas {
+			height: 420px;
+		}
+		.panel {
+			max-height: none;
+		}
+		.bar-col {
+			display: none;
+		}
+	}
+	.alerts {
+		margin-top: 20px;
+		padding-top: 20px;
+		border-top: 1px solid var(--border);
+	}
+	.alerts h3 {
+		margin: 0 0 4px;
+	}
+	.alerts-row {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin-top: 8px;
+	}
+	.alerts-row input[type='email'] {
+		flex: 1 1 240px;
+		min-width: 0;
+		font: inherit;
+		color: var(--text);
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 8px 12px;
+	}
+	.alerts .hp {
+		position: absolute;
+		left: -9999px;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+	}
+	#alerts-msg:empty {
+		display: none;
+	}
+	#alerts-msg[data-kind='ok'] {
+		color: var(--ended);
+	}
+	#alerts-msg[data-kind='error'] {
+		color: var(--active);
+	}
+</style>

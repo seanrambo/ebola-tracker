@@ -1,43 +1,50 @@
 {
-  "updated": "2026-10-07",
+  "updated": "2026-10-06",
   "epidemic": {
-    "name": "2026 Central Africa Ebola epidemic",
-    "virus": "Bundibugyo virus",
+    "virus": "bundibugyo",
     "firstConfirmed": "2026-05-15",
     "pheic": "2026-05-16",
-    "summary": "The 17th Ebola outbreak in the Democratic Republic of the Congo is caused by Bundibugyo virus. It was confirmed in Ituri on 15 May 2026 and spread to North Kivu and four other provinces. WHO declared it a public health emergency of international concern on 16 May. Unlike Ebola virus (Zaire), Bundibugyo virus has no licensed vaccine or specific treatment."
+    "summary": {
+      "en": "The 17th Ebola outbreak in the Democratic Republic of the Congo is caused by Bundibugyo virus. It was confirmed in Ituri on 15 May 2026 and has spread to seven provinces. WHO declared it a public health emergency of international concern on 16 May. Unlike Ebola virus (Zaire), Bundibugyo virus has no licensed vaccine or specific treatment.",
+      "sw": "Mlipuko wa 17 wa Ebola katika Jamhuri ya Kidemokrasia ya Kongo unasababishwa na virusi vya Bundibugyo. Ulithibitishwa Ituri tarehe 15 Mei 2026 na umeenea katika mikoa saba. Shirika la Afya Duniani (WHO) liliutangaza kuwa dharura ya afya ya umma ya kimataifa tarehe 16 Mei. Tofauti na virusi vya Ebola (Zaire), virusi vya Bundibugyo havina chanjo wala tiba maalum iliyoidhinishwa.",
+      "fr": "La 17e épidémie d'Ebola en République démocratique du Congo est causée par le virus Bundibugyo. Elle a été confirmée en Ituri le 15 mai 2026 et s'est étendue à sept provinces. L'OMS l'a déclarée urgence de santé publique de portée internationale le 16 mai. Contrairement au virus Ebola (Zaïre), le virus Bundibugyo ne dispose d'aucun vaccin ni traitement spécifique homologué."
+    }
   },
   "who": {
-    "asOf": "2026-08-26",
-    "confirmed": 5815,
-    "deaths": 2788,
-    "url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON616"
+    "asOf": "2026-10-06",
+    "confirmed": 8750,
+    "deaths": 4208,
+    "url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON619"
   },
   "countries": [
     {
       "code": "CD",
-      "name": "Democratic Republic of the Congo",
       "status": "active",
-      "virus": "Bundibugyo virus",
+      "virus": "bundibugyo",
       "declared": "2026-05-15",
+      "ended": null,
       "confirmed": 8728,
       "probable": null,
-      "suspected": 494,
+      "suspected": null,
       "deaths": 4205,
       "recovered": 2269,
       "lat": -2.9,
       "lng": 23.6,
-      "asOf": "2026-10-07",
-      "source": "DRC National Institute of Public Health (INSP) situation reports, as compiled on Wikipedia",
-      "sourceUrl": "https://en.wikipedia.org/wiki/2026_Central_Africa_Ebola_epidemic",
-      "note": "Transmission is concentrated in Ituri and North Kivu, where insecurity complicates the response."
+      "asOf": "2026-10-06",
+      "source": "WHO Disease Outbreak News (2026-DON619)",
+      "sourceUrl": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON619",
+      "note": {
+        "en": "Transmission is concentrated in Ituri and North Kivu, where insecurity complicates the response. A health worker evacuated to the Netherlands on 1 October is counted here.",
+        "sw": "Maambukizi yamejikita Ituri na Kivu Kaskazini, ambako ukosefu wa usalama unatatiza juhudi za kukabiliana na mlipuko. Mhudumu wa afya aliyehamishiwa Uholanzi tarehe 1 Oktoba amehesabiwa hapa.",
+        "fr": "La transmission est concentrée en Ituri et au Nord-Kivu, où l'insécurité complique la riposte. Un agent de santé évacué vers les Pays-Bas le 1er octobre est comptabilisé ici."
+      }
     },
     {
       "code": "KE",
-      "name": "Kenya",
       "status": "imported",
-      "virus": "Bundibugyo virus",
+      "virus": "bundibugyo",
       "declared": "2026-10-06",
+      "ended": null,
       "confirmed": 1,
       "probable": null,
       "suspected": null,
@@ -45,16 +52,19 @@
       "recovered": null,
       "lat": -1.29,
       "lng": 36.82,
-      "asOf": "2026-10-07",
-      "source": "Kenya Ministry of Health, as compiled on Wikipedia",
-      "sourceUrl": "https://en.wikipedia.org/wiki/2026_Central_Africa_Ebola_epidemic",
-      "note": "One imported case and death on 6 October 2026: a Kenyan citizen who had lived in the DRC. Contacts are being monitored."
+      "asOf": "2026-10-06",
+      "source": "WHO Disease Outbreak News (2026-DON619)",
+      "sourceUrl": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON619",
+      "note": {
+        "en": "One imported case, who died on 5 October 2026. The patient lived in the DRC and travelled to Nairobi through Uganda. Contacts, including flight passengers, are being traced.",
+        "sw": "Mgonjwa mmoja aliyeingia kutoka nje ya nchi, aliyefariki tarehe 5 Oktoba 2026. Mgonjwa aliishi DRC na alisafiri hadi Nairobi kupitia Uganda. Watu waliokutana naye, wakiwemo abiria wa ndege, wanafuatiliwa.",
+        "fr": "Un cas importé, décédé le 5 octobre 2026. Le patient vivait en RDC et s'est rendu à Nairobi en passant par l'Ouganda. Ses contacts, y compris les passagers du vol, sont en cours de suivi."
+      }
     },
     {
       "code": "UG",
-      "name": "Uganda",
       "status": "ended",
-      "virus": "Bundibugyo virus",
+      "virus": "bundibugyo",
       "declared": "2026-05-15",
       "ended": "2026-07-28",
       "confirmed": 20,
@@ -65,16 +75,20 @@
       "lat": 0.35,
       "lng": 32.58,
       "asOf": "2026-08-26",
-      "source": "WHO Disease Outbreak News",
+      "source": "WHO Disease Outbreak News (2026-DON616)",
       "sourceUrl": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON616",
-      "note": "Uganda declared its outbreak over on 28 July 2026 after 42 days without new cases. WHO certified the declaration on 26 August."
+      "note": {
+        "en": "Uganda declared its outbreak over on 28 July 2026 after 42 days without new cases, and WHO certified this on 26 August. Contacts of Kenya's imported case, who passed through Uganda, are being traced.",
+        "sw": "Uganda ilitangaza kumalizika kwa mlipuko wake tarehe 28 Julai 2026 baada ya siku 42 bila wagonjwa wapya, na WHO ilithibitisha hilo tarehe 26 Agosti. Watu waliokutana na mgonjwa wa Kenya, aliyepitia Uganda, wanafuatiliwa.",
+        "fr": "L'Ouganda a déclaré la fin de son épidémie le 28 juillet 2026, après 42 jours sans nouveau cas, ce que l'OMS a certifié le 26 août. Les contacts du cas importé au Kenya, qui a transité par l'Ouganda, sont en cours de suivi."
+      }
     },
     {
       "code": "FR",
-      "name": "France",
       "status": "ended",
-      "virus": "Bundibugyo virus",
+      "virus": "bundibugyo",
       "declared": "2026-06-24",
+      "ended": null,
       "confirmed": 1,
       "probable": null,
       "suspected": null,
@@ -83,55 +97,109 @@
       "lat": 48.86,
       "lng": 2.35,
       "asOf": "2026-08-26",
-      "source": "WHO Disease Outbreak News",
+      "source": "WHO Disease Outbreak News (2026-DON616)",
       "sourceUrl": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON616",
-      "note": "One imported case: a doctor returning from a humanitarian mission in the DRC. The 42-day monitoring period has been completed."
+      "note": {
+        "en": "One imported case: a doctor returning from a humanitarian mission in the DRC. The 42-day monitoring period has been completed.",
+        "sw": "Mgonjwa mmoja aliyeingia kutoka nje ya nchi: daktari aliyerejea kutoka kazi ya kibinadamu nchini DRC. Kipindi cha ufuatiliaji cha siku 42 kimekamilika.",
+        "fr": "Un cas importé : un médecin de retour d'une mission humanitaire en RDC. La période de surveillance de 42 jours est terminée."
+      }
     }
   ],
   "regions": [
-    { "country": "CD", "name": "Ituri", "lat": 1.56, "lng": 30.25, "confirmed": 6513, "deaths": 3007 },
-    { "country": "CD", "name": "North Kivu", "lat": 0.2, "lng": 29.2, "confirmed": 1785, "deaths": 1021 },
-    { "country": "CD", "name": "Haut-Uélé", "lat": 3.2, "lng": 28.2, "confirmed": 364, "deaths": 153 },
-    { "country": "CD", "name": "Tshopo", "lat": 0.52, "lng": 25.19, "confirmed": 51, "deaths": 18 },
-    { "country": "CD", "name": "Bas-Uélé", "lat": 2.79, "lng": 24.73, "confirmed": 10, "deaths": 4 },
-    { "country": "CD", "name": "South Kivu", "lat": -2.51, "lng": 28.86, "confirmed": 3, "deaths": 1 },
-    { "country": "CD", "name": "Sud-Ubangi", "lat": 3.25, "lng": 19.77, "confirmed": 2, "deaths": 1 }
+    { "country": "CD", "name": { "en": "Ituri", "sw": "Ituri", "fr": "Ituri" }, "lat": 1.56, "lng": 30.25, "confirmed": 6480, "deaths": 2989 },
+    { "country": "CD", "name": { "en": "North Kivu", "sw": "Kivu Kaskazini", "fr": "Nord-Kivu" }, "lat": 0.2, "lng": 29.2, "confirmed": 1755, "deaths": 1013 },
+    { "country": "CD", "name": { "en": "Haut-Uélé", "sw": "Haut-Uélé", "fr": "Haut-Uélé" }, "lat": 3.2, "lng": 28.2, "confirmed": 364, "deaths": 153 },
+    { "country": "CD", "name": { "en": "Tshopo", "sw": "Tshopo", "fr": "Tshopo" }, "lat": 0.52, "lng": 25.19, "confirmed": 51, "deaths": 17 },
+    { "country": "CD", "name": { "en": "Bas-Uélé", "sw": "Bas-Uélé", "fr": "Bas-Uélé" }, "lat": 2.79, "lng": 24.73, "confirmed": 10, "deaths": 4 },
+    { "country": "CD", "name": { "en": "South Kivu", "sw": "Kivu Kusini", "fr": "Sud-Kivu" }, "lat": -2.51, "lng": 28.86, "confirmed": 3, "deaths": 1 },
+    { "country": "CD", "name": { "en": "Sud-Ubangi", "sw": "Sud-Ubangi", "fr": "Sud-Ubangi" }, "lat": 3.25, "lng": 19.77, "confirmed": 2, "deaths": 1 }
   ],
   "timeline": [
-    { "date": "2026-04-24", "text": "The earliest known suspected case in Ituri develops haemorrhagic symptoms." },
-    { "date": "2026-05-05", "text": "WHO is alerted and sends a response team." },
-    { "date": "2026-05-15", "text": "Sequencing identifies Bundibugyo virus. The DRC confirms the outbreak in Ituri, and Uganda reports an imported case." },
-    { "date": "2026-05-16", "text": "WHO declares a public health emergency of international concern." },
-    { "date": "2026-06-24", "text": "France confirms an imported case in a doctor returning from the DRC." },
-    { "date": "2026-07-28", "text": "Uganda declares its outbreak over after 42 days without new cases." },
-    { "date": "2026-08-26", "text": "WHO reports 5,815 confirmed cases and 2,788 deaths across all countries." },
-    { "date": "2026-10-06", "text": "Kenya confirms its first case, which was fatal." }
+    {
+      "date": "2026-04-24",
+      "text": {
+        "en": "The earliest known suspected case in Ituri develops haemorrhagic symptoms.",
+        "sw": "Mgonjwa wa kwanza anayejulikana kushukiwa, huko Ituri, anaanza kuonyesha dalili za kutokwa damu.",
+        "fr": "Le premier cas suspect connu, en Ituri, présente des symptômes hémorragiques."
+      }
+    },
+    {
+      "date": "2026-05-05",
+      "text": {
+        "en": "WHO is alerted and sends a response team.",
+        "sw": "WHO inapewa taarifa na kutuma timu ya kukabiliana na mlipuko.",
+        "fr": "L'OMS est alertée et dépêche une équipe d'intervention."
+      }
+    },
+    {
+      "date": "2026-05-15",
+      "text": {
+        "en": "Sequencing identifies Bundibugyo virus. The DRC confirms the outbreak in Ituri, and Uganda reports an imported case.",
+        "sw": "Uchunguzi wa vinasaba unatambua virusi vya Bundibugyo. DRC inathibitisha mlipuko Ituri, na Uganda inaripoti mgonjwa aliyeingia kutoka nje.",
+        "fr": "Le séquençage identifie le virus Bundibugyo. La RDC confirme l'épidémie en Ituri et l'Ouganda signale un cas importé."
+      }
+    },
+    {
+      "date": "2026-05-16",
+      "text": {
+        "en": "WHO declares a public health emergency of international concern.",
+        "sw": "WHO inatangaza dharura ya afya ya umma ya kimataifa.",
+        "fr": "L'OMS déclare une urgence de santé publique de portée internationale."
+      }
+    },
+    {
+      "date": "2026-06-24",
+      "text": {
+        "en": "France confirms an imported case in a doctor returning from the DRC.",
+        "sw": "Ufaransa inathibitisha mgonjwa aliyeingia kutoka nje, daktari aliyerejea kutoka DRC.",
+        "fr": "La France confirme un cas importé chez un médecin de retour de RDC."
+      }
+    },
+    {
+      "date": "2026-07-28",
+      "text": {
+        "en": "Uganda declares its outbreak over after 42 days without new cases.",
+        "sw": "Uganda inatangaza kumalizika kwa mlipuko wake baada ya siku 42 bila wagonjwa wapya.",
+        "fr": "L'Ouganda déclare la fin de son épidémie après 42 jours sans nouveau cas."
+      }
+    },
+    {
+      "date": "2026-10-01",
+      "text": {
+        "en": "A health worker who tested positive in the DRC is evacuated to the Netherlands for treatment.",
+        "sw": "Mhudumu wa afya aliyepatikana na virusi DRC anahamishiwa Uholanzi kwa matibabu.",
+        "fr": "Un agent de santé testé positif en RDC est évacué vers les Pays-Bas pour y être soigné."
+      }
+    },
+    {
+      "date": "2026-10-06",
+      "text": {
+        "en": "Kenya confirms its first case, an imported case that was fatal. The DRC passes 8,700 confirmed cases.",
+        "sw": "Kenya inathibitisha mgonjwa wake wa kwanza, aliyeingia kutoka nje ya nchi na aliyefariki. DRC inapita wagonjwa 8,700 waliothibitishwa.",
+        "fr": "Le Kenya confirme son premier cas, un cas importé mortel. La RDC dépasse 8 700 cas confirmés."
+      }
+    }
   ],
   "history": [
-    { "year": 1976, "place": "Yambuku", "country": "CD", "virus": "Ebola virus (Zaire)", "cases": 318, "deaths": 280, "lat": 2.82, "lng": 22.23 },
-    { "year": 1976, "place": "Nzara & Maridi", "country": "SS", "virus": "Sudan virus", "cases": 284, "deaths": 151, "lat": 4.64, "lng": 28.26 },
-    { "year": 1995, "place": "Kikwit", "country": "CD", "virus": "Ebola virus (Zaire)", "cases": 315, "deaths": 250, "lat": -5.04, "lng": 18.82 },
-    { "year": 2000, "place": "Gulu", "country": "UG", "virus": "Sudan virus", "cases": 425, "deaths": 224, "lat": 2.78, "lng": 32.3 },
-    { "year": 2007, "place": "Bundibugyo", "country": "UG", "virus": "Bundibugyo virus", "cases": 131, "deaths": 42, "lat": 0.71, "lng": 30.06 },
-    { "year": 2007, "place": "Luebo, Kasai", "country": "CD", "virus": "Ebola virus (Zaire)", "cases": 264, "deaths": 187, "lat": -5.35, "lng": 21.42 },
-    { "year": 2012, "place": "Isiro", "country": "CD", "virus": "Bundibugyo virus", "cases": 57, "deaths": 29, "lat": 2.77, "lng": 27.62 },
-    { "year": 2014, "place": "Guinea (West Africa epidemic)", "country": "GN", "virus": "Ebola virus (Zaire)", "cases": 3814, "deaths": 2544, "lat": 8.56, "lng": -10.13 },
-    { "year": 2014, "place": "Sierra Leone (West Africa epidemic)", "country": "SL", "virus": "Ebola virus (Zaire)", "cases": 14124, "deaths": 3956, "lat": 8.48, "lng": -13.23 },
-    { "year": 2014, "place": "Liberia (West Africa epidemic)", "country": "LR", "virus": "Ebola virus (Zaire)", "cases": 10678, "deaths": 4810, "lat": 6.3, "lng": -10.8 },
-    { "year": 2014, "place": "Lagos", "country": "NG", "virus": "Ebola virus (Zaire)", "cases": 20, "deaths": 8, "lat": 6.52, "lng": 3.38 },
-    { "year": 2014, "place": "Bamako", "country": "ML", "virus": "Ebola virus (Zaire)", "cases": 8, "deaths": 6, "lat": 12.64, "lng": -8.0 },
-    { "year": 2014, "place": "Dallas", "country": "US", "virus": "Ebola virus (Zaire)", "cases": 4, "deaths": 1, "lat": 32.78, "lng": -96.8 },
-    { "year": 2018, "place": "North Kivu & Ituri", "country": "CD", "virus": "Ebola virus (Zaire)", "cases": 3470, "deaths": 2287, "lat": 0.49, "lng": 29.47 },
-    { "year": 2020, "place": "Mbandaka, Équateur", "country": "CD", "virus": "Ebola virus (Zaire)", "cases": 130, "deaths": 55, "lat": 0.05, "lng": 18.26 },
-    { "year": 2021, "place": "Nzérékoré", "country": "GN", "virus": "Ebola virus (Zaire)", "cases": 23, "deaths": 12, "lat": 7.75, "lng": -8.82 },
-    { "year": 2022, "place": "Mubende", "country": "UG", "virus": "Sudan virus", "cases": 164, "deaths": 77, "lat": 0.56, "lng": 31.39 },
-    { "year": 2025, "place": "Kampala", "country": "UG", "virus": "Sudan virus", "cases": 14, "deaths": 4, "lat": 0.35, "lng": 32.58 },
-    { "year": 2025, "place": "Bulape, Kasai", "country": "CD", "virus": "Ebola virus (Zaire)", "cases": 64, "deaths": 45, "lat": -4.58, "lng": 21.07 }
-  ],
-  "neighbours": {
-    "CD": ["AO", "BI", "CF", "CG", "RW", "SS", "TZ", "UG", "ZM"],
-    "KE": ["ET", "SO", "SS", "TZ", "UG"],
-    "UG": ["CD", "KE", "RW", "SS", "TZ"],
-    "FR": ["AD", "BE", "CH", "DE", "ES", "IT", "LU", "MC"]
-  }
+    { "year": 1976, "place": "Yambuku", "country": "CD", "virus": "zaire", "cases": 318, "deaths": 280, "lat": 2.82, "lng": 22.23 },
+    { "year": 1976, "place": "Nzara & Maridi", "country": "SS", "virus": "sudan", "cases": 284, "deaths": 151, "lat": 4.64, "lng": 28.26 },
+    { "year": 1995, "place": "Kikwit", "country": "CD", "virus": "zaire", "cases": 315, "deaths": 250, "lat": -5.04, "lng": 18.82 },
+    { "year": 2000, "place": "Gulu", "country": "UG", "virus": "sudan", "cases": 425, "deaths": 224, "lat": 2.78, "lng": 32.3 },
+    { "year": 2007, "place": "Bundibugyo", "country": "UG", "virus": "bundibugyo", "cases": 131, "deaths": 42, "lat": 0.71, "lng": 30.06 },
+    { "year": 2007, "place": "Luebo, Kasai", "country": "CD", "virus": "zaire", "cases": 264, "deaths": 187, "lat": -5.35, "lng": 21.42 },
+    { "year": 2012, "place": "Isiro", "country": "CD", "virus": "bundibugyo", "cases": 57, "deaths": 29, "lat": 2.77, "lng": 27.62 },
+    { "year": 2014, "place": { "en": "Guinea (West Africa epidemic)", "sw": "Guinea (janga la Afrika Magharibi)", "fr": "Guinée (épidémie d'Afrique de l'Ouest)" }, "country": "GN", "virus": "zaire", "cases": 3814, "deaths": 2544, "lat": 8.56, "lng": -10.13 },
+    { "year": 2014, "place": { "en": "Sierra Leone (West Africa epidemic)", "sw": "Sierra Leone (janga la Afrika Magharibi)", "fr": "Sierra Leone (épidémie d'Afrique de l'Ouest)" }, "country": "SL", "virus": "zaire", "cases": 14124, "deaths": 3956, "lat": 8.48, "lng": -13.23 },
+    { "year": 2014, "place": { "en": "Liberia (West Africa epidemic)", "sw": "Liberia (janga la Afrika Magharibi)", "fr": "Libéria (épidémie d'Afrique de l'Ouest)" }, "country": "LR", "virus": "zaire", "cases": 10678, "deaths": 4810, "lat": 6.3, "lng": -10.8 },
+    { "year": 2014, "place": "Lagos", "country": "NG", "virus": "zaire", "cases": 20, "deaths": 8, "lat": 6.52, "lng": 3.38 },
+    { "year": 2014, "place": "Bamako", "country": "ML", "virus": "zaire", "cases": 8, "deaths": 6, "lat": 12.64, "lng": -8.0 },
+    { "year": 2014, "place": "Dallas", "country": "US", "virus": "zaire", "cases": 4, "deaths": 1, "lat": 32.78, "lng": -96.8 },
+    { "year": 2018, "place": { "en": "North Kivu & Ituri", "sw": "Kivu Kaskazini na Ituri", "fr": "Nord-Kivu et Ituri" }, "country": "CD", "virus": "zaire", "cases": 3470, "deaths": 2287, "lat": 0.49, "lng": 29.47 },
+    { "year": 2020, "place": "Mbandaka, Équateur", "country": "CD", "virus": "zaire", "cases": 130, "deaths": 55, "lat": 0.05, "lng": 18.26 },
+    { "year": 2021, "place": "Nzérékoré", "country": "GN", "virus": "zaire", "cases": 23, "deaths": 12, "lat": 7.75, "lng": -8.82 },
+    { "year": 2022, "place": "Mubende", "country": "UG", "virus": "sudan", "cases": 164, "deaths": 77, "lat": 0.56, "lng": 31.39 },
+    { "year": 2025, "place": "Kampala", "country": "UG", "virus": "sudan", "cases": 14, "deaths": 4, "lat": 0.35, "lng": 32.58 },
+    { "year": 2025, "place": "Bulape, Kasai", "country": "CD", "virus": "zaire", "cases": 64, "deaths": 45, "lat": -4.58, "lng": 21.07 }
+  ]
 }

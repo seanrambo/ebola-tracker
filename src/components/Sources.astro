@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/ebola.json';
+import changelog from '../data/changelog.json';
+import { t, fmtDate, type Lang } from '../i18n';
+
+interface Props {
+	lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang);
+const s = d.sources;
+const entries = (changelog as { date: string; source: string; changes: string[] }[]).slice(-15).reverse();
+---
+
+<Base title={d.meta.sourcesTitle} description={d.meta.sourcesDescription} lang={lang}>
+	<section>
+		<div class="wrap prose">
+			<h1>{s.title}</h1>
+			<p class="muted">{s.updated(fmtDate(data.updated, lang))}</p>
+
+			<h2>{s.whereTitle}</h2>
+			<ul>
+				<li><a href="https://www.who.int/emergencies/disease-outbreak-news">{s.whoItem}</a></li>
+				<li><a href="https://www.cdc.gov/ebola/outbreaks/index.html">{s.cdcItem}</a></li>
+			</ul>
+
+			<h2>{s.autoTitle}</h2>
+			<p>{s.auto}</p>
+
+			<h2>{s.countTitle}</h2>
+			<ul>{s.count.map((c) => <li set:html={c} />)}</ul>
+
+			<h2>{s.statusTitle}</h2>
+			<ul class="status-list">
+				{
+					(['active', 'imported', 'ended', 'monitoring'] as const).map((k) => (
+						<li>
+							<span class="badge" data-status={k}>
+								{d.status[k]}
+							</span>{' '}
+							{s.statusText[k]}
+						</li>
+					))
+				}
+			</ul>
+
+			<h2>{s.locationTitle}</h2>
+			<p>{s.location}</p>
+
+			<h2>{s.alertsTitle}</h2>
+			<p>{s.alerts}</p>
+
+			<h2>{s.openTitle}</h2>
+			<p set:html={s.open} />
+
+			<h2>{s.limitsTitle}</h2>
+			<ul>{s.limits.map((l) => <li>{l}</li>)}</ul>
+
+			<h2>{s.changelogTitle}</h2>
+			{entries.length === 0 && <p class="muted">{s.changelogEmpty}</p>}
+			<ul class="changelog">
+				{
+					entries.map((e) => (
+						<li>
+							<time datetime={e.date}>{fmtDate(e.date, lang)}</time> · <a href={e.source}>{e.source.split('/').pop()}</a>
+							<ul>{e.changes.map((c) => <li>{c}</li>)}</ul>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.prose {
+		max-width: 760px;
+	}
+	.prose li {
+		margin-bottom: 8px;
+	}
+	.prose h2 {
+		margin-top: 32px;
+	}
+	.status-list {
+		list-style: none;
+		padding: 0;
+	}
+	.changelog time {
+		color: var(--muted);
+	}
+	.changelog ul {
+		margin-top: 4px;
+		font-size: 0.9rem;
+	}
+</style>
