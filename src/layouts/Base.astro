@@ -1,0 +1,324 @@
+---
+interface Props {
+	title: string;
+	description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta name="theme-color" content="#0a0f17" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="wrap header-inner">
+				<a href="/" class="brand">
+					<span class="brand-dot" aria-hidden="true"></span>
+					Ebola Tracker
+				</a>
+				<nav>
+					<a href="/#globe">Globe</a>
+					<a href="/#guidance">Guidance</a>
+					<a href="/#history">History</a>
+					<a href="/sources">Sources</a>
+				</nav>
+			</div>
+		</header>
+		<main>
+			<slot />
+		</main>
+		<footer class="site-footer">
+			<div class="wrap">
+				<p>
+					This site is for information only and is not medical advice. If you have symptoms, contact your national
+					health ministry or a health worker. Figures come from public reports and can lag behind events.
+				</p>
+				<p>
+					<a href="/sources">Sources &amp; method</a> · <a href="/api/stats.json">JSON</a> ·
+					<a href="/api/stats.csv">CSV</a>
+				</p>
+			</div>
+		</footer>
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--bg: #0a0f17;
+		--surface: #111824;
+		--surface-2: #172131;
+		--border: #243044;
+		--text: #e7ecf3;
+		--muted: #93a0b4;
+		--accent: #4ea8de;
+		--active: #e5484d;
+		--imported: #f76b15;
+		--monitoring: #ffb224;
+		--ended: #3e9b8f;
+		--none: #5b6578;
+		--radius: 12px;
+		color-scheme: dark;
+	}
+	* {
+		box-sizing: border-box;
+	}
+	html {
+		scroll-behavior: smooth;
+	}
+	body {
+		margin: 0;
+		background: var(--bg);
+		color: var(--text);
+		font: 16px/1.55 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+		-webkit-font-smoothing: antialiased;
+	}
+	a {
+		color: var(--accent);
+	}
+	h1,
+	h2,
+	h3 {
+		line-height: 1.2;
+		margin: 0 0 0.5em;
+	}
+	h2 {
+		font-size: 1.5rem;
+	}
+	.wrap {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 16px;
+	}
+	section {
+		padding: 40px 0;
+	}
+	.muted {
+		color: var(--muted);
+	}
+	.card {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: 20px;
+	}
+	.num {
+		font-variant-numeric: tabular-nums;
+	}
+	.badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		padding: 3px 10px;
+		border-radius: 999px;
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		white-space: nowrap;
+	}
+	.badge::before {
+		content: '';
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--c, var(--none));
+	}
+	.badge[data-status='active'] {
+		--c: var(--active);
+	}
+	.badge[data-status='imported'] {
+		--c: var(--imported);
+	}
+	.badge[data-status='monitoring'] {
+		--c: var(--monitoring);
+	}
+	.badge[data-status='ended'] {
+		--c: var(--ended);
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.95rem;
+	}
+	th,
+	td {
+		text-align: left;
+		padding: 10px 12px;
+		border-bottom: 1px solid var(--border);
+	}
+	th {
+		color: var(--muted);
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+	td.r,
+	th.r {
+		text-align: right;
+	}
+	.table-scroll {
+		overflow-x: auto;
+	}
+	select,
+	button {
+		font: inherit;
+		color: var(--text);
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 8px 12px;
+	}
+	button {
+		cursor: pointer;
+	}
+	button:hover {
+		border-color: var(--accent);
+	}
+	button[aria-pressed='true'] {
+		background: var(--accent);
+		color: #04121d;
+		border-color: var(--accent);
+	}
+
+	/* Content rendered by src/scripts/app.ts */
+	.small {
+		font-size: 0.875rem;
+	}
+	.ph {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin-top: 12px;
+	}
+	.ph h3 {
+		margin: 0;
+		font-size: 1.25rem;
+	}
+	.stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+		gap: 8px;
+		margin: 12px 0;
+	}
+	.stats div {
+		background: var(--surface-2);
+		border-radius: 8px;
+		padding: 10px 12px;
+	}
+	.stats dt {
+		color: var(--muted);
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+	.stats dd {
+		margin: 2px 0 0;
+		font-size: 1.25rem;
+		font-weight: 700;
+	}
+	h4 {
+		margin: 16px 0 8px;
+		font-size: 0.95rem;
+	}
+	.plist,
+	.past {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: grid;
+		gap: 6px;
+	}
+	.plist button {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		gap: 8px;
+		text-align: left;
+		font-size: 0.9rem;
+	}
+	.past li {
+		font-size: 0.9rem;
+	}
+	button.link {
+		background: none;
+		border: 0;
+		padding: 0;
+		color: var(--accent);
+		text-decoration: underline;
+	}
+	.gl-tip {
+		background: rgba(10, 15, 23, 0.92);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 6px 10px;
+		font: 13px/1.4 system-ui, sans-serif;
+		color: var(--text);
+	}
+
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background: rgba(10, 15, 23, 0.85);
+		backdrop-filter: blur(8px);
+		border-bottom: 1px solid var(--border);
+	}
+	.header-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 56px;
+		gap: 16px;
+	}
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-weight: 700;
+		color: var(--text);
+		text-decoration: none;
+	}
+	.brand-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--active);
+		box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.25);
+	}
+	.site-header nav {
+		display: flex;
+		gap: 16px;
+		overflow-x: auto;
+	}
+	.site-header nav a {
+		color: var(--muted);
+		text-decoration: none;
+		font-size: 0.95rem;
+	}
+	.site-header nav a:hover {
+		color: var(--text);
+	}
+	.site-footer {
+		border-top: 1px solid var(--border);
+		padding: 24px 0 40px;
+		color: var(--muted);
+		font-size: 0.9rem;
+	}
+	@media (max-width: 560px) {
+		.site-header nav a:nth-child(-n + 3) {
+			display: none;
+		}
+	}
+</style>

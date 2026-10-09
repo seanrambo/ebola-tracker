@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/ebola.json';
+import { fmtDate } from '../lib/format';
+
+const sources = [...new Map(data.countries.map((c) => [c.sourceUrl, c.source])).entries()];
+---
+
+<Base title="Sources & method — Ebola Tracker" description="Where the Ebola Tracker's figures come from, how they are counted, and their limits.">
+	<section>
+		<div class="wrap prose">
+			<h1>Sources &amp; method</h1>
+			<p class="muted">Data last updated {fmtDate(data.updated)}.</p>
+
+			<h2>Where the figures come from</h2>
+			<ul>
+				<li><a href={data.who.url}>WHO Disease Outbreak News</a>: the official verified totals, which lag behind national reports.</li>
+				{sources.map(([url, name]) => <li><a href={url}>{name}</a></li>)}
+				<li><a href="https://www.cdc.gov/ebola/outbreaks/index.html">CDC outbreak history</a> and WHO end-of-outbreak statements for past outbreaks.</li>
+			</ul>
+
+			<h2>How we count</h2>
+			<ul>
+				<li><strong>Confirmed</strong> cases were confirmed by a laboratory test. <strong>Probable</strong> and <strong>suspected</strong> cases are shown separately, and a dash means the source did not report that figure.</li>
+				<li><strong>Case fatality</strong> is deaths divided by confirmed cases. While an outbreak is ongoing this is a rough guide, because some current patients will still recover or die.</li>
+				<li>Each country shows its own "as of" date. Countries are not always updated on the same day.</li>
+				<li>Past outbreak totals include confirmed, probable and suspected cases, following CDC and WHO practice.</li>
+			</ul>
+
+			<h2>Status labels</h2>
+			<ul>
+				<li><span class="badge" data-status="active">Active outbreak</span> Local transmission is happening.</li>
+				<li><span class="badge" data-status="imported">Imported case</span> A case was infected elsewhere, and contacts are being monitored.</li>
+				<li><span class="badge" data-status="ended">Outbreak ended</span> 42 days (two incubation periods) have passed without a new case.</li>
+				<li><span class="badge" data-status="monitoring">Borders an affected country</span> No cases have been reported, but a neighbouring country has an active outbreak or imported case.</li>
+			</ul>
+
+			<h2>Your location</h2>
+			<p>
+				We estimate your country from your network location, using Netlify's edge geolocation, or from your browser language.
+				We do not store or log it. If you pick a country yourself, the choice is saved only in your browser.
+			</p>
+
+			<h2>Open data</h2>
+			<p>
+				All figures are free to reuse: <a href="/api/stats.json">/api/stats.json</a> and
+				<a href="/api/stats.csv">/api/stats.csv</a>. Both allow cross-origin requests. Please credit the original sources.
+			</p>
+
+			<h2>Limits</h2>
+			<ul>
+				<li>Province markers sit at approximate province centres, not exact case locations.</li>
+				<li>Reported figures can be revised, and national figures can differ from WHO's.</li>
+				<li>This site is not medical advice.</li>
+			</ul>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.prose {
+		max-width: 760px;
+	}
+	.prose li {
+		margin-bottom: 8px;
+	}
+	.prose h2 {
+		margin-top: 32px;
+	}
+</style>

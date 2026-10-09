@@ -1,0 +1,499 @@
+---
+import Base from '../layouts/Base.astro';
+import data from '../data/ebola.json';
+import countries from 'i18n-iso-countries';
+import en from 'i18n-iso-countries/langs/en.json';
+import { fmt, fmtDate, cfr, STATUS_LABEL } from '../lib/format';
+
+countries.registerLocale(en);
+const countryOptions = Object.entries(countries.getNames('en', { select: 'official' }))
+	.map(([code, name]) => ({ code, name }))
+	.sort((a, b) => a.name.localeCompare(b.name));
+
+const totals = data.countries.reduce(
+	(t, c) => ({ confirmed: t.confirmed + c.confirmed, deaths: t.deaths + c.deaths }),
+	{ confirmed: 0, deaths: 0 },
+);
+const activeCountries = data.countries.filter((c) => c.status === 'active' || c.status === 'imported');
+const history = [...data.history].sort((a, b) => b.year - a.year || b.cases - a.cases);
+const regions = [...data.regions].sort((a, b) => b.confirmed - a.confirmed);
+
+const rumours = [
+	{
+		q: 'Can mosquitoes spread Ebola?',
+		a: 'No. There is no evidence that mosquitoes or other insects spread Ebola. It spreads through direct contact with the blood or body fluids of a sick or dead person, or an infected animal.',
+	},
+	{
+		q: 'Can I catch Ebola from the air, or by standing near someone?',
+		a: 'Ebola is not airborne like flu or measles. You need direct contact, through broken skin or your eyes, nose or mouth, with body fluids such as blood, vomit, stool, sweat or semen, or with objects soiled by them.',
+	},
+	{
+		q: 'Can someone without symptoms spread Ebola?',
+		a: 'No. People are not contagious before symptoms start. Symptoms appear 2 to 21 days after infection. The virus can stay in semen for months after recovery, so survivors should follow health-worker advice.',
+	},
+	{
+		q: 'Is there a vaccine?',
+		a: 'There is a licensed vaccine (Ervebo) and two licensed antibody treatments, but they work only against Ebola virus (Zaire). The 2026 outbreak is caused by Bundibugyo virus, which has no licensed vaccine or specific treatment. Early supportive care in a treatment centre, such as fluids and treatment of symptoms, greatly improves survival.',
+	},
+	{
+		q: 'Can salt water, herbs or antibiotics cure Ebola?',
+		a: 'No. None of these cure Ebola, and delaying care makes survival less likely. Go to a health facility, and call ahead first.',
+	},
+	{
+		q: 'Is Ebola always fatal?',
+		a: 'No. Thousands of people have survived Ebola. In the 2026 outbreak about half of confirmed patients have died, and the earlier people get care, the better their chances.',
+	},
+];
+---
+
+<Base
+	title="Ebola Tracker — 2026 outbreak, cases near you and an interactive globe"
+	description="Track the 2026 Bundibugyo Ebola epidemic by country and province, see the situation where you are, and explore every major outbreak since 1976 on an interactive globe."
+>
+	<section class="hero">
+		<div class="wrap">
+			<p class="eyebrow"><span class="badge" data-status="active">Public health emergency of international concern</span></p>
+			<h1>{data.epidemic.name}</h1>
+			<p class="lede">{data.epidemic.summary}</p>
+			<p class="muted small">Last updated {fmtDate(data.updated)} · <a href="/sources">How we count</a></p>
+
+			<div class="kpis">
+				<div class="kpi"><span class="kpi-v num">{fmt(totals.confirmed)}</span><span class="kpi-l">Confirmed cases</span></div>
+				<div class="kpi"><span class="kpi-v num" style="color: var(--active)">{fmt(totals.deaths)}</span><span class="kpi-l">Deaths</span></div>
+				<div class="kpi"><span class="kpi-v num">{cfr(totals.deaths, totals.confirmed)}</span><span class="kpi-l">Case fatality</span></div>
+				<div class="kpi"><span class="kpi-v num">{data.countries.length}</span><span class="kpi-l">Countries with cases</span></div>
+				<div class="kpi"><span class="kpi-v num">{activeCountries.length}</span><span class="kpi-l">Active or new now</span></div>
+			</div>
+			<p class="muted small">
+				The latest WHO-verified total is {fmt(data.who.confirmed)} confirmed cases and {fmt(data.who.deaths)} deaths, as of {fmtDate(data.who.asOf)} (<a href={data.who.url}>WHO</a>). The figures above are later national reports.
+			</p>
+		</div>
+	</section>
+
+	<section id="where" class="tight">
+		<div class="wrap">
+			<div class="card local" id="local">
+				<div class="local-head">
+					<div>
+						<h2>Where you are</h2>
+						<p class="muted small" id="local-detect">Detecting your country…</p>
+					</div>
+					<label class="local-pick">
+						<span class="muted small">Change country</span>
+						<select id="country-select">
+							<option value="">Choose a country</option>
+							{countryOptions.map((c) => <option value={c.code}>{c.name}</option>)}
+						</select>
+					</label>
+				</div>
+				<div id="local-body" aria-live="polite"></div>
+			</div>
+		</div>
+	</section>
+
+	<section id="globe">
+		<div class="wrap">
+			<div class="globe-head">
+				<div>
+					<h2>Explore the globe</h2>
+					<p class="muted">Tap a country or a marker to see the cases there. Drag to rotate, and scroll or pinch to zoom.</p>
+				</div>
+				<div class="toggles" role="group" aria-label="Layers">
+					<button id="layer-current" aria-pressed="true">2026 epidemic</button>
+					<button id="layer-history" aria-pressed="false">Past outbreaks</button>
+				</div>
+			</div>
+			<div class="globe-grid">
+				<div class="globe-box">
+					<div id="globe-canvas" aria-label="Interactive globe of Ebola cases"></div>
+					<p class="globe-loading muted" id="globe-loading">Loading globe…</p>
+					<ul class="legend">
+						<li><span style="--c: var(--active)"></span>Active outbreak</li>
+						<li><span style="--c: var(--imported)"></span>Imported case</li>
+						<li><span style="--c: var(--ended)"></span>Outbreak ended</li>
+						<li><span style="--c: var(--monitoring)"></span>Borders an affected country</li>
+						<li><span class="dot" style="--c: #ffd166"></span>Past outbreak</li>
+					</ul>
+				</div>
+				<aside class="card panel" id="panel" aria-live="polite">
+					<p class="muted">Select a country or marker on the globe to see its figures.</p>
+				</aside>
+			</div>
+		</div>
+	</section>
+
+	<section id="now">
+		<div class="wrap">
+			<h2>Outbreaks right now</h2>
+			<div class="country-grid">
+				{
+					data.countries.map((c) => (
+						<button class="card country-card" data-country={c.code}>
+							<span class="cc-top">
+								<strong>{c.name}</strong>
+								<span class="badge" data-status={c.status}>{STATUS_LABEL[c.status]}</span>
+							</span>
+							<span class="cc-stats">
+								<span><b class="num">{fmt(c.confirmed)}</b> confirmed</span>
+								<span><b class="num">{fmt(c.deaths)}</b> deaths</span>
+							</span>
+							<span class="muted small">{c.virus} · as of {fmtDate(c.asOf)}</span>
+						</button>
+					))
+				}
+			</div>
+
+			<h3 class="sub">Democratic Republic of the Congo, by province</h3>
+			<div class="card table-scroll">
+				<table>
+					<thead>
+						<tr><th>Province</th><th class="r">Confirmed</th><th class="r">Deaths</th><th class="r">Case fatality</th><th class="bar-col"></th></tr>
+					</thead>
+					<tbody>
+						{
+							regions.map((r) => (
+								<tr>
+									<td>{r.name}</td>
+									<td class="r num">{fmt(r.confirmed)}</td>
+									<td class="r num">{fmt(r.deaths)}</td>
+									<td class="r num">{cfr(r.deaths, r.confirmed)}</td>
+									<td class="bar-col">
+										<span class="bar" style={`width:${Math.max(1, (r.confirmed / regions[0].confirmed) * 100)}%`} />
+									</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+			<p class="muted small">Source: DRC National Institute of Public Health situation reports, as of {fmtDate(data.countries[0].asOf)}.</p>
+
+			<h3 class="sub">Timeline</h3>
+			<ol class="timeline">
+				{
+					data.timeline.map((t) => (
+						<li>
+							<time datetime={t.date}>{fmtDate(t.date)}</time>
+							<span>{t.text}</span>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<section id="guidance">
+		<div class="wrap">
+			<h2>Protect yourself</h2>
+			<div class="guide-grid">
+				<div class="card">
+					<h3>Symptoms</h3>
+					<p>Symptoms start suddenly, 2 to 21 days after infection:</p>
+					<ul>
+						<li>fever, tiredness, muscle pain, headache and sore throat</li>
+						<li>then vomiting, diarrhoea and a rash</li>
+						<li>sometimes bleeding, such as from the gums or in stool</li>
+					</ul>
+				</div>
+				<div class="card">
+					<h3>How it spreads</h3>
+					<ul>
+						<li>Direct contact with the blood, vomit, stool or other body fluids of a sick person</li>
+						<li>Touching the body of someone who died of Ebola, for example during burial rites</li>
+						<li>Bedding, clothes or needles soiled with body fluids</li>
+						<li>Infected wild animals such as fruit bats and monkeys</li>
+					</ul>
+				</div>
+				<div class="card">
+					<h3>What to do</h3>
+					<ul>
+						<li>If you have a fever within 21 days of being in an affected area or near a sick person, stay apart from others.</li>
+						<li><strong>Call a health facility or your health ministry before you go</strong>, so they can receive you safely.</li>
+						<li>Do not touch sick people or bodies without protective equipment. Ask for a safe and dignified burial.</li>
+						<li>Wash your hands often with soap and water.</li>
+					</ul>
+				</div>
+			</div>
+
+			<h3 class="sub">Is this true?</h3>
+			<div class="rumours">
+				{
+					rumours.map((r) => (
+						<details class="card">
+							<summary>{r.q}</summary>
+							<p>{r.a}</p>
+						</details>
+					))
+				}
+			</div>
+			<p class="muted small">Based on <a href="https://www.who.int/news-room/fact-sheets/detail/ebola-disease">WHO guidance on Ebola disease</a>.</p>
+		</div>
+	</section>
+
+	<section id="history">
+		<div class="wrap">
+			<h2>Major outbreaks since 1976</h2>
+			<p class="muted">Turn on "Past outbreaks" on the globe to see these on the map.</p>
+			<div class="card table-scroll">
+				<table>
+					<thead>
+						<tr><th>Year</th><th>Place</th><th>Virus</th><th class="r">Cases</th><th class="r">Deaths</th><th class="r">Case fatality</th></tr>
+					</thead>
+					<tbody>
+						{
+							history.map((h) => (
+								<tr>
+									<td class="num">{h.year}</td>
+									<td>{h.place}</td>
+									<td class="muted">{h.virus}</td>
+									<td class="r num">{fmt(h.cases)}</td>
+									<td class="r num">{fmt(h.deaths)}</td>
+									<td class="r num">{cfr(h.deaths, h.cases)}</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+			<p class="muted small">Sources: CDC and WHO outbreak histories. Figures include confirmed, probable and suspected cases.</p>
+		</div>
+	</section>
+</Base>
+
+<script>
+	import { initApp } from '../scripts/app';
+	initApp();
+</script>
+
+<style>
+	.hero {
+		padding: 48px 0 24px;
+		background: radial-gradient(ellipse at top, rgba(229, 72, 77, 0.12), transparent 60%);
+	}
+	.hero h1 {
+		font-size: clamp(1.8rem, 4vw, 2.8rem);
+		letter-spacing: -0.02em;
+	}
+	.eyebrow {
+		margin: 0 0 12px;
+	}
+	.lede {
+		max-width: 760px;
+		font-size: 1.05rem;
+	}
+	.small {
+		font-size: 0.875rem;
+	}
+	.kpis {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		gap: 12px;
+		margin: 24px 0 12px;
+	}
+	.kpi {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: 16px;
+		display: flex;
+		flex-direction: column;
+	}
+	.kpi-v {
+		font-size: 1.8rem;
+		font-weight: 700;
+	}
+	.kpi-l {
+		color: var(--muted);
+		font-size: 0.85rem;
+	}
+	section.tight {
+		padding: 8px 0;
+	}
+	.local-head {
+		display: flex;
+		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
+		align-items: flex-start;
+	}
+	.local-head h2 {
+		margin: 0;
+	}
+	.local-pick {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		min-width: 0;
+		max-width: 100%;
+	}
+	.local-pick select {
+		max-width: 100%;
+	}
+	.globe-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+	.toggles {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+	.globe-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 340px;
+		gap: 16px;
+	}
+	.globe-box {
+		position: relative;
+		background: radial-gradient(circle at 50% 45%, #13213a, var(--bg) 70%);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		overflow: hidden;
+	}
+	#globe-canvas {
+		height: 560px;
+		cursor: grab;
+	}
+	.globe-loading {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		margin: 0;
+		pointer-events: none;
+	}
+	.legend {
+		position: absolute;
+		left: 12px;
+		bottom: 12px;
+		list-style: none;
+		margin: 0;
+		padding: 10px 12px;
+		background: rgba(10, 15, 23, 0.8);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		font-size: 0.8rem;
+		display: grid;
+		gap: 4px;
+		pointer-events: none;
+	}
+	.legend span {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		border-radius: 3px;
+		background: var(--c);
+		margin-right: 8px;
+		vertical-align: -2px;
+	}
+	.legend span.dot {
+		border-radius: 50%;
+	}
+	.panel {
+		max-height: 560px;
+		overflow-y: auto;
+	}
+	.country-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+		gap: 12px;
+	}
+	.country-card {
+		text-align: left;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 16px;
+	}
+	.cc-top {
+		display: flex;
+		justify-content: space-between;
+		gap: 8px;
+		align-items: flex-start;
+	}
+	.cc-stats {
+		display: flex;
+		gap: 16px;
+	}
+	.sub {
+		margin-top: 32px;
+	}
+	.bar-col {
+		width: 30%;
+	}
+	.bar {
+		display: block;
+		height: 8px;
+		border-radius: 4px;
+		background: var(--active);
+	}
+	.timeline {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		border-left: 2px solid var(--border);
+	}
+	.timeline li {
+		position: relative;
+		padding: 0 0 16px 20px;
+		display: grid;
+		gap: 2px;
+	}
+	.timeline li::before {
+		content: '';
+		position: absolute;
+		left: -6px;
+		top: 6px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--active);
+	}
+	.timeline time {
+		color: var(--muted);
+		font-size: 0.85rem;
+	}
+	.guide-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 12px;
+	}
+	.guide-grid ul {
+		padding-left: 1.2em;
+		margin: 0;
+	}
+	.guide-grid li {
+		margin-bottom: 6px;
+	}
+	.rumours {
+		display: grid;
+		gap: 8px;
+	}
+	.rumours details {
+		padding: 14px 18px;
+	}
+	.rumours summary {
+		cursor: pointer;
+		font-weight: 600;
+	}
+	.rumours p {
+		margin: 10px 0 0;
+	}
+	@media (max-width: 900px) {
+		.globe-grid {
+			grid-template-columns: 1fr;
+		}
+		#globe-canvas {
+			height: 420px;
+		}
+		.panel {
+			max-height: none;
+		}
+		.bar-col {
+			display: none;
+		}
+	}
+</style>
